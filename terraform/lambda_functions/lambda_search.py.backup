@@ -1,0 +1,183 @@
+import json
+import boto3
+import os
+from datetime import datetime
+
+dynamodb = boto3.resource('dynamodb')
+lambda_client = boto3.client('lambda')
+
+customers_table = dynamodb.Table(os.environ['CUSTOMERS_TABLE'])
+wallets_table = dynamodb.Table(os.environ['WALLETS_TABLE'])
+transactions_table = dynamodb.Table(os.environ['TRANSACTIONS_TABLE'])
+risk_registry_table = dynamodb.Table(os.environ['RISK_REGISTRY_TABLE'])
+wallet_clusters_table = dynamodb.Table(os.environ['WALLET_CLUSTERS_TABLE'])
+
+def enrich_with_luno(wallet_address):
+    """Call Luno enrichment Lambda to get exchange data"""
+    try:
+        print(f"Enriching wallet {wallet_address} with Luno data...")
+        response = lambda_client.invoke(
+            FunctionName='project-zar-luno-enrichment',
+            InvocationType='RequestResponse',
+            Payload=json.dumps({
+                'body': json.dumps({'wallet_address': wallet_address})
+            })
+        )
+        
+        result = json.loads(response['Payload'].read().decode())
+        body = json.loads(result['body'])
+        luno_data = body.get('luno_data')
+        
+        if luno_data:
+            print(f"✓ Luno data retrieved: {len(luno_data.get('market_tickers', []))} tickers")
+        
+        return luno_data
+    except Exception as e:
+        print(f"Luno enrichment error: {e}")
+        return None
+
+def calculate_combined_risk(wallet, luno_data):
+    """Calculate risk score combining blockchain and exchange data"""
+    risk_score = wallet.get('risk_score', 0)
+    
+    # Add exchange risk factors
+    if luno_data and luno_data.get('market_tickers'):
+        tickers = luno_data['market_tickers']
+        
+        # High volume trading patterns can indicate suspicious activity
+        high_volume_count = 0
+        for ticker in tickers:
+            try:
+                volume = float(ticker.get('rolling_24_hour_volume', 0))
+                if volume > 5000:
+                    high_volume_count += 1
+            except:
+                pass
+        
+        # If trading on multiple high-volume pairs, increase risk
+        if high_volume_count > 3:
+            risk_score += 15
+        elif high_volume_count > 1:
+            risk_score += 5
+    
+    return min(risk_score, 100)
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+        query = body['query']
+        query_type = body['query_type']  # 'sa_id' or 'wallet_address'
+        
+        # Search by SA ID
+        if query_type == 'sa_id':
+            response = customers_table.query(
+                IndexName='sa_id-index',
+                KeyConditionExpression='sa_id = :sa_id',
+                ExpressionAttributeValues={':sa_id': query}
+            )
+        # Search by wallet address
+        else:
+            response = wallets_table.query(
+                IndexName='wallet_address-index',
+                KeyConditionExpression='wallet_address = :address',
+                ExpressionAttributeValues={':address': query}
+            )
+            if not response['Items']:
+                return {
+                    'statusCode': 404,
+                    'body': json.dumps({'error': 'Wallet not found'})
+                }
+            
+            customer_id = response['Items'][0]['customer_id']
+            customer_response = customers_table.get_item(Key={'customer_id': customer_id})
+            response['Items'] = [customer_response['Item']]
+        
+        if not response['Items']:
+            return {
+                'statusCode': 404,
+                'body': json.dumps({'error': 'Customer not found'})
+            }
+        
+        customer = response['Items'][0]
+        customer_id = customer['customer_id']
+        
+        # Get all wallets for this customer
+        wallets_response = wallets_table.query(
+            IndexName='customer_id-index',
+            KeyConditionExpression='customer_id = :cid',
+            ExpressionAttributeValues={':cid': customer_id}
+        )
+        
+        wallets = wallets_response['Items']
+        declared = [w for w in wallets if w.get('declared', False)]
+        undeclared = [w for w in wallets if not w.get('declared', False)]
+        
+        # NEW: Enrich each wallet with Luno data
+        enriched_wallets = []
+        for wallet in wallets:
+            luno_data = enrich_with_luno(wallet['wallet_address'])
+            
+            enriched_wallet = wallet.copy()
+            enriched_wallet['luno_data'] = luno_data
+            enriched_wallet['combined_risk_score'] = calculate_combined_risk(wallet, luno_data)
+            
+            enriched_wallets.append(enriched_wallet)
+        
+        # Recalculate declared/undeclared with enriched data
+        declared = [w for w in enriched_wallets if w.get('declared', False)]
+        undeclared = [w for w in enriched_wallets if not w.get('declared', False)]
+        
+        # Calculate portfolio risk score (with Luno enrichment)
+        portfolio_risk = sum(w.get('combined_risk_score', 0) for w in enriched_wallets) / len(enriched_wallets) if enriched_wallets else 0
+        
+        # Get risk flags
+        risk_flags = []
+        for wallet in enriched_wallets:
+            tx_response = transactions_table.query(
+                IndexName='from_wallet_id-index',
+                KeyConditionExpression='from_wallet_id = :wid',
+                ExpressionAttributeValues={':wid': wallet['wallet_id']}
+            )
+            
+            for tx in tx_response['Items']:
+                risk_response = risk_registry_table.get_item(Key={'wallet_address': tx.get('to_wallet_id', '')})
+                if 'Item' in risk_response:
+                    risk_item = risk_response['Item']
+                    risk_flags.append({
+                        'type': risk_item.get('risk_type', 'unknown'),
+                        'description': f"Transaction to {risk_item.get('risk_type', 'unknown')} address",
+                        'severity': 'high' if risk_item.get('risk_score', 0) > 70 else 'medium'
+                    })
+            
+            # NEW: Add Luno-based risk flags
+            if wallet.get('luno_data'):
+                if wallet['combined_risk_score'] > wallet.get('risk_score', 0):
+                    risk_flags.append({
+                        'type': 'high_exchange_volume',
+                        'description': 'High trading volume on Luno detected',
+                        'severity': 'medium'
+                    })
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'customer_id': customer_id,
+                'sa_id': customer.get('sa_id', ''),
+                'name': f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
+                'declared_wallets': declared,
+                'undeclared_wallets': undeclared,
+                'portfolio_risk_score': int(portfolio_risk),
+                'portfolio_risk_score_with_luno': int(portfolio_risk),  # NEW
+                'risk_flags': risk_flags,
+                'enriched_at': datetime.now().isoformat(),
+                'luno_integration': 'enabled'
+            })
+        }
+    except Exception as e:
+        print(f"Search error: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': str(e)})
+        }

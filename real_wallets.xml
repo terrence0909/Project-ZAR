@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<travel_rule_data>
+  <metadata>
+    <source>compliance_system_v2.3</source>
+    <timestamp>2025-11-30T14:23:17Z</timestamp>
+    <version>1.2</version>
+  </metadata>
+  
+  <customers>
+    <customer>
+      <customer_id>CUST_2023115582</customer_id>
+      <sa_id>1990042312345</sa_id>
+      <first_name>James</first_name>
+      <last_name>Chen</last_name>
+      <email>james.chen@email.com</email>
+      <vasp_id>VASP_KRAKEN_ASIA</vasp_id>
+      <created_at>2023-05-15T09:12:34Z</created_at>
+      <last_kyc_review>2025-08-10T11:30:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+    </customer>
+    
+    <customer>
+      <customer_id>CUST_2024021873</customer_id>
+      <sa_id>1987121543210</sa_id>
+      <first_name>Maria</first_name>
+      <last_name>Rodriguez</last_name>
+      <email>maria.rdz@business.org</email>
+      <vasp_id>VASP_COINBASE_PRO</vasp_id>
+      <created_at>2024-02-18T14:45:22Z</created_at>
+      <last_kyc_review>2025-10-05T15:20:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+    </customer>
+    
+    <customer>
+      <customer_id>CUST_2023054091</customer_id>
+      <sa_id>1995100787654</sa_id>
+      <first_name>David</first_name>
+      <last_name>Kim</last_name>
+      <email>david.kim@startup.io</email>
+      <vasp_id>VASP_BINANCE_SG</vasp_id>
+      <created_at>2023-05-20T16:30:45Z</created_at>
+      <last_kyc_review>2025-09-22T10:15:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+    </customer>
+    
+    <customer>
+      <customer_id>CUST_2024112234</customer_id>
+      <sa_id>2001081965432</sa_id>
+      <first_name>Sarah</first_name>
+      <last_name>Johnson</last_name>
+      <email>sarah.j@university.edu</email>
+      <vasp_id>VASP_GEMINI_US</vasp_id>
+      <created_at>2024-11-02T11:20:33Z</created_at>
+      <last_kyc_review>2025-11-15T09:45:00Z</last_kyc_review>
+      <kyc_status>PENDING_ENHANCED</kyc_status>
+    </customer>
+    
+    <customer>
+      <customer_id>CUST_2022097655</customer_id>
+      <sa_id>1978031298765</sa_id>
+      <first_name>Thomas</first_name>
+      <last_name>Schmidt</last_name>
+      <email>thomas.schmidt@finance.de</email>
+      <vasp_id>VASP_BITSTAMP_EU</vasp_id>
+      <created_at>2022-09-10T08:45:12Z</created_at>
+      <last_kyc_review>2025-07-30T13:10:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+    </customer>
+  </customers>
+  
+  <wallets>
+    <!-- James Chen - Low risk investor -->
+    <wallet>
+      <wallet_id>WALLET_JC_MAIN</wallet_id>
+      <customer_id>CUST_2023115582</customer_id>
+      <wallet_address>0x742d35Cc6634C0532925a3b844Bc9e0BBE863C4D</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>12</risk_score>
+      <balance>47.82</balance>
+      <currency>ETH</currency>
+      <created_at>2023-05-20T10:15:30Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-11-28T16:45:22Z</last_activity>
+      <transaction_count>156</transaction_count>
+    </wallet>
+    
+    <!-- Maria Rodriguez - Active trader -->
+    <wallet>
+      <wallet_id>WALLET_MR_TRADING</wallet_id>
+      <customer_id>CUST_2024021873</customer_id>
+      <wallet_address>0x28c6c06298d514Db089934071355E5743bf21d60</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>35</risk_score>
+      <balance>124.56</balance>
+      <currency>ETH</currency>
+      <created_at>2024-02-25T09:30:15Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-11-29T22:10:45Z</last_activity>
+      <transaction_count>892</transaction_count>
+    </wallet>
+    
+    <!-- Undeclared wallet linked to Maria Rodriguez -->
+    <wallet>
+      <wallet_id>WALLET_MR_UNDECLARED</wallet_id>
+      <customer_id>CUST_2024021873</customer_id>
+      <wallet_address>0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936F0bE</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>false</declared>
+      <risk_score>72</risk_score>
+      <balance>256.34</balance>
+      <currency>ETH</currency>
+      <created_at>2024-03-10T14:20:00Z</created_at>
+      <source>chain_analysis</source>
+      <last_activity>2025-11-30T01:15:33Z</last_activity>
+      <transaction_count>1245</transaction_count>
+    </wallet>
+    
+    <!-- David Kim - DeFi user -->
+    <wallet>
+      <wallet_id>WALLET_DK_DEFI</wallet_id>
+      <customer_id>CUST_2023054091</customer_id>
+      <wallet_address>0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>28</risk_score>
+      <balance>18.92</balance>
+      <currency>ETH</currency>
+      <created_at>2023-06-05T11:45:20Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-11-29T18:30:12Z</last_activity>
+      <transaction_count>567</transaction_count>
+    </wallet>
+    
+    <!-- Sarah Johnson - New user, flagged for review -->
+    <wallet>
+      <wallet_id>WALLET_SJ_NEW</wallet_id>
+      <customer_id>CUST_2024112234</customer_id>
+      <wallet_address>0xdfd5293d8e347dfe59e90efd55b2956a1343963d</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>55</risk_score>
+      <balance>3.45</balance>
+      <currency>ETH</currency>
+      <created_at>2024-11-05T13:25:40Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-11-30T10:05:18Z</last_activity>
+      <transaction_count>23</transaction_count>
+      <flags>HIGH_VALUE_UNUSUAL_PATTERN</flags>
+    </wallet>
+    
+    <!-- Thomas Schmidt - Institutional wallet -->
+    <wallet>
+      <wallet_id>WALLET_TS_INSTITUTIONAL</wallet_id>
+      <customer_id>CUST_2022097655</customer_id>
+      <wallet_address>0x876EabF441B2EE5B5b0554Fd502a8E0600950cFa</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>8</risk_score>
+      <balance>892.17</balance>
+      <currency>ETH</currency>
+      <created_at>2022-09-15T15:30:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-11-28T09:45:00Z</last_activity>
+      <transaction_count>342</transaction_count>
+    </wallet>
+    
+    <!-- Multi-chain wallets -->
+    <wallet>
+      <wallet_id>WALLET_DK_SOLANA</wallet_id>
+      <customer_id>CUST_2023054091</customer_id>
+      <wallet_address>5tzFkiKscXHK5ZXCGbXZgd5qmKKc4U6PtfxGfLZRA6tB</wallet_address>
+      <blockchain>solana</blockchain>
+      <declared>true</declared>
+      <risk_score>32</risk_score>
+      <balance>1250.50</balance>
+      <currency>SOL</currency>
+      <created_at>2024-01-12T10:20:45Z</created_at>
+      <source>manual_declaration</source>
+      <last_activity>2025-11-29T20:15:30Z</last_activity>
+      <transaction_count>289</transaction_count>
+    </wallet>
+    
+    <wallet>
+      <wallet_id>WALLET_MR_POLYGON</wallet_id>
+      <customer_id>CUST_2024021873</customer_id>
+      <wallet_address>0x7EA2be2df7BA6E54B1A9C70676f668455E329d29</wallet_address>
+      <blockchain>polygon</blockchain>
+      <declared>false</declared>
+      <risk_score>65</risk_score>
+      <balance>12500.75</balance>
+      <currency>MATIC</currency>
+      <created_at>2024-06-18T16:40:22Z</created_at>
+      <source>chain_analysis</source>
+      <last_activity>2025-11-30T03:45:11Z</last_activity>
+      <transaction_count>678</transaction_count>
+    </wallet>
+  </wallets>
+</travel_rule_data>

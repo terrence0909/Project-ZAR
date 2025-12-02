@@ -1,0 +1,18 @@
+{
+    "LambdaFunctionConfigurations": [
+        {
+            "LambdaFunctionArn": "arn:aws:lambda:us-east-1:509399598950:function:project-zar-data-import",
+            "Events": ["s3:ObjectCreated:*"],
+            "Filter": {
+                "Key": {
+                    "FilterRules": [
+                        {
+                            "Name": "prefix",
+                            "Value": "uploads/"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

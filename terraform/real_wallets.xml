@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<travel_rule_data>
+  <metadata>
+    <source>manual_import</source>
+    <timestamp>2025-11-30T00:00:00Z</timestamp>
+    <version>1.0</version>
+  </metadata>
+  
+  <customers>
+    <customer>
+      <customer_id>cust_vitalik_001</customer_id>
+      <sa_id>1111111111111</sa_id>
+      <first_name>Vitalik</first_name>
+      <last_name>Buterin</last_name>
+      <email>vitalik@ethereum.org</email>
+      <vasp_id>VASP_ETH_FOUNDATION</vasp_id>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+    </customer>
+    
+    <customer>
+      <customer_id>cust_coinbase_user_001</customer_id>
+      <sa_id>2222222222222</sa_id>
+      <first_name>John</first_name>
+      <last_name>Crypto</last_name>
+      <email>john.crypto@example.com</email>
+      <vasp_id>VASP_COINBASE</vasp_id>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+    </customer>
+    
+    <customer>
+      <customer_id>cust_opensea_trader_001</customer_id>
+      <sa_id>3333333333333</sa_id>
+      <first_name>Sarah</first_name>
+      <last_name>NFT</last_name>
+      <email>sarah.nft@example.com</email>
+      <vasp_id>VASP_OPENSEA</vasp_id>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+    </customer>
+  </customers>
+  
+  <wallets>
+    <!-- Vitalik's wallets - real addresses with known activity -->
+    <wallet>
+      <wallet_id>wallet_vitalik_main</wallet_id>
+      <customer_id>cust_vitalik_001</customer_id>
+      <wallet_address>0xd8da6bf26964af9d7eed9e03e53415d37aa96045</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>15</risk_score>
+      <balance>0</balance>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+      <source>manual_import</source>
+    </wallet>
+    
+    <!-- Active trader wallets -->
+    <wallet>
+      <wallet_id>wallet_trader_001</wallet_id>
+      <customer_id>cust_coinbase_user_001</customer_id>
+      <wallet_address>0x1f9090aae28b8a3dcecc2fafcdef9f3778915e81</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>32</risk_score>
+      <balance>5.5</balance>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+      <source>manual_import</source>
+    </wallet>
+    
+    <!-- Undeclared wallet - higher risk -->
+    <wallet>
+      <wallet_id>wallet_trader_undeclared</wallet_id>
+      <customer_id>cust_coinbase_user_001</customer_id>
+      <wallet_address>0x2f9090aae28b8a3dcecc2fafcdef9f3778915e82</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>false</declared>
+      <risk_score>68</risk_score>
+      <balance>12.3</balance>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+      <source>manual_import</source>
+    </wallet>
+    
+    <!-- NFT trader wallets -->
+    <wallet>
+      <wallet_id>wallet_nft_trader_001</wallet_id>
+      <customer_id>cust_opensea_trader_001</customer_id>
+      <wallet_address>0x3f9090aae28b8a3dcecc2fafcdef9f3778915e83</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>28</risk_score>
+      <balance>2.8</balance>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+      <source>manual_import</source>
+    </wallet>
+    
+    <wallet>
+      <wallet_id>wallet_nft_trader_002</wallet_id>
+      <customer_id>cust_opensea_trader_001</customer_id>
+      <wallet_address>0x4f9090aae28b8a3dcecc2fafcdef9f3778915e84</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>false</declared>
+      <risk_score>45</risk_score>
+      <balance>8.7</balance>
+      <created_at>2025-11-30T00:00:00Z</created_at>
+      <source>manual_import</source>
+    </wallet>
+  </wallets>
+</travel_rule_data>
