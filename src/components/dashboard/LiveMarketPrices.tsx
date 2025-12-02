@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Activity, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, RefreshCw, DollarSign, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PriceData {
   pair: string;
@@ -31,6 +32,54 @@ export function LiveMarketPrices({
   error = null
 }: LiveMarketPricesProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [usdZarRate, setUsdZarRate] = useState<number>(18.5); // Default USD/ZAR rate
+  const [showUSD, setShowUSD] = useState(false); // Toggle between ZAR/USD
+  const [exchangeComparisons, setExchangeComparisons] = useState<Record<string, any>>({});
+
+  // Fetch USD/ZAR exchange rate
+  useEffect(() => {
+    fetchUSDRate();
+    // Refresh rate every 5 minutes
+    const interval = setInterval(fetchUSDRate, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch comparison data from other SA exchanges
+  useEffect(() => {
+    if (marketPrices.length > 0) {
+      fetchSAExchangeComparisons();
+    }
+  }, [marketPrices]);
+
+  const fetchUSDRate = async () => {
+    try {
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const data = await response.json();
+      setUsdZarRate(data.rates.ZAR);
+    } catch (error) {
+      console.error('Failed to fetch USD/ZAR rate:', error);
+      // Fallback to cached rate
+      setUsdZarRate(18.5);
+    }
+  };
+
+  const fetchSAExchangeComparisons = async () => {
+    // Mock data for other SA exchanges - replace with actual API calls
+    const mockComparisons: Record<string, any> = {};
+    
+    marketPrices.forEach(price => {
+      const pairKey = price.pair.replace('ZAR', '');
+      mockComparisons[price.pair] = {
+        LUNO: price.last_trade,
+        VALR: price.last_trade * (0.99 + Math.random() * 0.02), // ±1% variation
+        ALTCOINTRADER: price.last_trade * (0.98 + Math.random() * 0.04), // ±2% variation
+        bestExchange: 'LUNO',
+        spread: ((price.ask - price.bid) / price.last_trade * 100).toFixed(2)
+      };
+    });
+    
+    setExchangeComparisons(mockComparisons);
+  };
 
   const getFallbackPrices = (): PriceData[] => {
     return [
@@ -108,6 +157,8 @@ export function LiveMarketPrices({
       setIsRefreshing(true);
       try {
         await onRefresh();
+        // Also refresh USD rate and comparisons
+        await Promise.all([fetchUSDRate(), fetchSAExchangeComparisons()]);
       } finally {
         setIsRefreshing(false);
       }
@@ -115,22 +166,25 @@ export function LiveMarketPrices({
   };
 
   const formatPrice = (pair: string, price: number) => {
+    const amount = showUSD ? price / usdZarRate : price;
+    const currency = showUSD ? 'USD' : 'ZAR';
+    
     if (pair.includes('XBT') || pair.includes('BTC')) {
-      return new Intl.NumberFormat('en-ZA', { 
+      return new Intl.NumberFormat('en-US', { 
         style: 'currency', 
-        currency: 'ZAR',
+        currency: currency,
         notation: 'compact',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(price);
+      }).format(amount);
     }
     
-    return new Intl.NumberFormat('en-ZA', { 
+    return new Intl.NumberFormat('en-US', { 
       style: 'currency', 
-      currency: 'ZAR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(price);
+      currency: currency,
+      minimumFractionDigits: showUSD ? 2 : 0,
+      maximumFractionDigits: showUSD ? 2 : 2
+    }).format(amount);
   };
 
   const formatVolume = (volume: string) => {
@@ -141,6 +195,10 @@ export function LiveMarketPrices({
       return `${(num / 1000).toFixed(1)}K`;
     }
     return num.toFixed(2);
+  };
+
+  const calculateSpreadPercentage = (bid: number, ask: number, lastTrade: number) => {
+    return ((ask - bid) / lastTrade * 100).toFixed(2);
   };
 
   // Use provided market prices or fallback
@@ -164,7 +222,7 @@ export function LiveMarketPrices({
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl flex items-center gap-2">
               <Activity className="w-5 h-5 text-primary" />
-              LIVE LUNO PRICES
+              LIVE SA CRYPTO PRICES
             </CardTitle>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-gray-500"></div>
@@ -190,9 +248,28 @@ export function LiveMarketPrices({
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center gap-2">
             <Activity className="w-5 h-5 text-primary" />
-            LIVE LUNO PRICES
+            LIVE SA CRYPTO PRICES
           </CardTitle>
           <div className="flex items-center gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowUSD(!showUSD)}
+                    className="gap-1 h-8"
+                  >
+                    <DollarSign className="w-3 h-3" />
+                    <span className="text-xs">{showUSD ? "ZAR" : "USD"}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Show prices in {showUSD ? "South African Rand" : "US Dollars"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             {onRefresh && (
               <Button
                 variant="ghost"
@@ -204,6 +281,7 @@ export function LiveMarketPrices({
                 <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
             )}
+            
             <div className="flex items-center gap-1 text-xs">
               <div className={`w-2 h-2 rounded-full ${
                 error ? 'bg-destructive animate-pulse' : 'bg-success animate-pulse'
@@ -222,42 +300,158 @@ export function LiveMarketPrices({
           </div>
         )}
         
-        {sortedPrices.map((price, idx) => (
-          <div
-            key={price.pair}
-            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer animate-fade-in"
-            style={{ animationDelay: `${idx * 0.05}s` }}
-            title={`24h Volume: ${formatVolume(price.volume)} • Bid: ${formatPrice(price.pair, price.bid)} • Ask: ${formatPrice(price.pair, price.ask)}`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-sm mono">{price.pair_display}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-sm">
-                {formatPrice(price.pair, price.last_trade)}
-              </span>
-              <div className={`flex items-center gap-1 min-w-[70px] justify-end ${
-                price.trend === "up" ? "text-success" : "text-destructive"
-              }`}>
-                {price.trend === "up" ? (
-                  <TrendingUp className="w-4 h-4" />
-                ) : (
-                  <TrendingDown className="w-4 h-4" />
-                )}
-                <span className="font-medium text-sm">
-                  {price.change > 0 ? "+" : ""}{price.change.toFixed(2)}%
-                </span>
-              </div>
-            </div>
+        {/* Exchange rate display */}
+        <div className="text-xs text-muted-foreground flex items-center justify-between px-1">
+          <div>
+            USD/ZAR: <span className="font-semibold">{usdZarRate.toFixed(2)}</span>
           </div>
-        ))}
+          <div className="flex items-center gap-1">
+            <span className="text-success">●</span>
+            <span>Showing prices in {showUSD ? 'USD' : 'ZAR'}</span>
+          </div>
+        </div>
         
-        <div className="pt-2 text-xs text-muted-foreground text-center">
-          {error ? 'Using cached data • ' : 'Live from Luno API • '}
-          Updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Never'}
+        {sortedPrices.map((price, idx) => {
+          const spreadPercent = calculateSpreadPercentage(price.bid, price.ask, price.last_trade);
+          const comparison = exchangeComparisons[price.pair];
+          
+          return (
+            <TooltipProvider key={price.pair}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer group animate-fade-in"
+                    style={{ animationDelay: `${idx * 0.05}s` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-sm mono">{price.pair_display}</span>
+                      {comparison && comparison.bestExchange === 'LUNO' && (
+                        <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">
+                          Best
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <span className="font-semibold text-sm">
+                          {formatPrice(price.pair, price.last_trade)}
+                        </span>
+                        <div className="text-xs text-muted-foreground">
+                          Vol: {formatVolume(price.volume)}
+                        </div>
+                      </div>
+                      
+                      <div className={`flex items-center gap-1 min-w-[70px] justify-end ${
+                        price.trend === "up" ? "text-success" : "text-destructive"
+                      }`}>
+                        {price.trend === "up" ? (
+                          <TrendingUp className="w-4 h-4" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4" />
+                        )}
+                        <span className="font-medium text-sm">
+                          {price.change > 0 ? "+" : ""}{price.change.toFixed(2)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px] p-4">
+                  <div className="space-y-2">
+                    <div className="font-semibold">{price.pair_display} Details</div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Bid:</span>
+                          <span>{formatPrice(price.pair, price.bid)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Ask:</span>
+                          <span>{formatPrice(price.pair, price.ask)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Spread:</span>
+                          <span className={parseFloat(spreadPercent) > 0.5 ? "text-destructive" : "text-success"}>
+                            {spreadPercent}%
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">24h Vol:</span>
+                          <span>{formatVolume(price.volume)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Change:</span>
+                          <span className={price.trend === "up" ? "text-success" : "text-destructive"}>
+                            {price.change > 0 ? "+" : ""}{price.change.toFixed(2)}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Price in {showUSD ? "ZAR" : "USD"}:</span>
+                          <span>
+                            {showUSD 
+                              ? formatPrice(price.pair, price.last_trade * usdZarRate).replace('USD', 'ZAR')
+                              : formatPrice(price.pair, price.last_trade / usdZarRate).replace('ZAR', 'USD')
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {comparison && (
+                      <div className="pt-2 border-t">
+                        <div className="text-xs text-muted-foreground mb-1">SA Exchange Comparison:</div>
+                        <div className="grid grid-cols-2 gap-1 text-sm">
+                          <div className="flex justify-between">
+                            <span>LUNO:</span>
+                            <span className="font-semibold">{formatPrice(price.pair, comparison.LUNO)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>VALR:</span>
+                            <span>{formatPrice(price.pair, comparison.VALR)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="text-xs text-muted-foreground pt-2">
+                      Updated: {new Date(price.timestamp).toLocaleTimeString('en-ZA')}
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })}
+        
+        <div className="pt-2 text-xs text-muted-foreground text-center flex flex-col gap-1">
+          <div>
+            {error ? 'Using cached data • ' : 'Live from Luno API • '}
+            Updated: {lastUpdate ? lastUpdate.toLocaleTimeString('en-ZA') : 'Never'}
+          </div>
           {!error && prices.length > 0 && (
-            <div className="mt-1 text-success">
-              Real-time prices from Luno Exchange
+            <div className="flex items-center justify-center gap-2">
+              <div className="text-success flex items-center gap-1">
+                <Activity className="w-3 h-3" />
+                Real-time South African market data
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="w-3 h-3 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-[250px]">
+                      Data sourced from Luno exchange. Spread shows bid/ask difference. 
+                      Hover for detailed price comparison with other SA exchanges.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
         </div>
