@@ -45,7 +45,7 @@ const MarketData = ({ marketTickers, customerId }: MarketDataProps) => {
     const emoji = emojiMap[base] || "◇";
 
     return (
-      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
         <span className="text-lg font-bold">{emoji}</span>
       </div>
     );
@@ -78,38 +78,38 @@ const MarketData = ({ marketTickers, customerId }: MarketDataProps) => {
   };
 
   return (
-    <Card className="glass-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              Luno Market Data
+    <Card className="glass-card w-full max-w-full overflow-hidden">
+      <CardHeader className="px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <TrendingUp className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <span className="truncate">Luno Market Data</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="truncate text-sm">
               {customerId
                 ? `Market data for customer ${customerId.slice(0, 8)}...`
                 : "Real-time cryptocurrency prices from Luno exchange"}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">
               {marketTickers.length} pairs
             </Badge>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setExpanded(!expanded)}
-              className="h-8 px-2"
+              className="h-8 px-2 sm:px-3 whitespace-nowrap"
             >
               {expanded ? (
                 <>
-                  <ChevronUp className="w-4 h-4 mr-1" />
+                  <ChevronUp className="w-4 h-4 mr-1 flex-shrink-0" />
                   Less
                 </>
               ) : (
                 <>
-                  <ChevronDown className="w-4 h-4 mr-1" />
+                  <ChevronDown className="w-4 h-4 mr-1 flex-shrink-0" />
                   More
                 </>
               )}
@@ -117,27 +117,29 @@ const MarketData = ({ marketTickers, customerId }: MarketDataProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="px-3 sm:px-6">
+        <div className="space-y-2 sm:space-y-3">
           {displayTickers.map((ticker) => (
             <div
               key={ticker.pair}
-              className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 {getPairIcon(ticker.pair)}
-                <div>
-                  <div className="font-medium text-sm">{ticker.pair}</div>
+                <div className="min-w-0">
+                  <div className="font-medium text-sm sm:text-base truncate">
+                    {ticker.pair}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     Vol: {formatVolume(ticker.rolling_24_hour_volume)}
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-semibold text-sm">
+              <div className="text-right min-w-0 ml-2 sm:ml-4">
+                <div className="font-semibold text-sm sm:text-base truncate">
                   {formatPrice(ticker.last_trade, ticker.pair)}
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground truncate">
                   Spread:{" "}
                   {formatPrice(
                     (parseFloat(ticker.ask) - parseFloat(ticker.bid)).toFixed(2),
@@ -155,7 +157,7 @@ const MarketData = ({ marketTickers, customerId }: MarketDataProps) => {
               variant="outline"
               size="sm"
               onClick={() => setExpanded(true)}
-              className="text-xs"
+              className="text-xs w-full sm:w-auto"
             >
               Show {marketTickers.length - 6} more trading pairs
             </Button>

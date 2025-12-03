@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<travel_rule_data>
+  <metadata>
+    <source>FIRST_NATIONAL_BANK_CRYPTO_COMPLIANCE</source>
+    <timestamp>2025-03-15T09:30:00+02:00</timestamp>
+    <version>2.1</version>
+  </metadata>
+  
+  <customers>
+    <!-- Sipho Mthembu -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2023014587</customer_id>
+      <sa_id>8805065147089</sa_id>
+      <first_name>Sipho</first_name>
+      <last_name>Mthembu</last_name>
+      <email>sipho.mthembu@email.com</email>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2023-01-15T00:00:00Z</created_at>
+      <last_kyc_review>2024-12-10T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+      <risk_score>78</risk_score>
+      <pep_status>false</pep_status>
+      <fic_risk_category>HIGH</fic_risk_category>
+    </customer>
+    
+    <!-- Naledi Petersen -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2023089123</customer_id>
+      <sa_id>9507185284087</sa_id>
+      <first_name>Naledi</first_name>
+      <last_name>Petersen</last_name>
+      <email>naledi.p@techcompany.co.za</email>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2023-08-05T00:00:00Z</created_at>
+      <last_kyc_review>2024-11-15T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+      <risk_score>42</risk_score>
+      <pep_status>false</pep_status>
+      <fic_risk_category>MEDIUM</fic_risk_category>
+    </customer>
+    
+    <!-- Johannes Van der Merwe -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2022056734</customer_id>
+      <sa_id>5502035112085</sa_id>
+      <first_name>Johannes</first_name>
+      <last_name>Van der Merwe</last_name>
+      <email>johannes.vdm@gmail.com</email>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2022-05-20T00:00:00Z</created_at>
+      <last_kyc_review>2024-10-05T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+      <risk_score>18</risk_score>
+      <pep_status>false</pep_status>
+      <fic_risk_category>LOW</fic_risk_category>
+    </customer>
+    
+    <!-- Mandla Zulu -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2024067890</customer_id>
+      <sa_id>7006155287081</sa_id>
+      <first_name>Mandla</first_name>
+      <last_name>Zulu</last_name>
+      <email>mandla.z@parliament.gov.za</email>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2024-06-01T00:00:00Z</created_at>
+      <last_kyc_review>2025-01-15T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED_ENHANCED</kyc_status>
+      <risk_score>85</risk_score>
+      <pep_status>true</pep_status>
+      <fic_risk_category>HIGH</fic_risk_category>
+    </customer>
+  </customers>
+  
+  <wallets>
+    <!-- Sipho Mthembu - Ethereum wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_ETH_8805065147089_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2023014587</customer_id>
+      <wallet_address>0x742d35Cc6634C0532925a3b844Bc9e37F4f2a8f3a</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>78</risk_score>
+      <balance>24.85</balance>
+      <currency>ETH</currency>
+      <created_at>2021-08-15T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-14T00:00:00Z</last_activity>
+      <transaction_count>456</transaction_count>
+      <zar_value>1242500.00</zar_value>
+    </wallet>
+    
+    <!-- Sipho Mthembu - Undeclared Bitcoin wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_BTC_8805065147089_UNDECL</wallet_id>
+      <customer_id>FNB_CUST_ZA_2023014587</customer_id>
+      <wallet_address>bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</wallet_address>
+      <blockchain>bitcoin</blockchain>
+      <declared>false</declared>
+      <risk_score>92</risk_score>
+      <balance>3.75</balance>
+      <currency>BTC</currency>
+      <created_at>2020-05-10T00:00:00Z</created_at>
+      <source>chain_analysis</source>
+      <last_activity>2025-03-13T00:00:00Z</last_activity>
+      <transaction_count>892</transaction_count>
+      <zar_value>3697500.00</zar_value>
+      <flags>UNDECLARED_WALLET,DARKNET_MARKET_INTERACTION,HIGH_RISK_JURISDICTION</flags>
+    </wallet>
+    
+    <!-- Naledi Petersen - Ethereum wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_ETH_9507185284087_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2023089123</customer_id>
+      <wallet_address>0x28c6c06298d514Db089934071355E5743bf21d60</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>42</risk_score>
+      <balance>5.25</balance>
+      <currency>ETH</currency>
+      <created_at>2022-03-10T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-14T00:00:00Z</last_activity>
+      <transaction_count>234</transaction_count>
+      <zar_value>262500.00</zar_value>
+      <flags>DEFI_PROTOCOL_INTERACTION</flags>
+    </wallet>
+    
+    <!-- Johannes Van der Merwe - Ethereum wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_ETH_5502035112085_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2022056734</customer_id>
+      <wallet_address>0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>18</risk_score>
+      <balance>2.10</balance>
+      <currency>ETH</currency>
+      <created_at>2021-12-05T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-10T00:00:00Z</last_activity>
+      <transaction_count>45</transaction_count>
+      <zar_value>105000.00</zar_value>
+      <flags>LOW_ACTIVITY</flags>
+    </wallet>
+    
+    <!-- Mandla Zulu - PEP Ethereum wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_ETH_7006155287081_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2024067890</customer_id>
+      <wallet_address>0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936F0bE</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>85</risk_score>
+      <balance>12.50</balance>
+      <currency>ETH</currency>
+      <created_at>2023-11-20T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-12T00:00:00Z</last_activity>
+      <transaction_count>67</transaction_count>
+      <zar_value>625000.00</zar_value>
+      <flags>POLITICALLY_EXPOSED_PERSON,HIGH_VALUE_TRANSACTIONS</flags>
+    </wallet>
+  </wallets>
+</travel_rule_data>

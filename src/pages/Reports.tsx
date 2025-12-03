@@ -2,13 +2,13 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Calendar, Filter, Search, AlertTriangle, Building, Shield, Loader2, Eye } from "lucide-react";
+import { FileText, Download, Calendar, Filter, Search, AlertTriangle, Building, Shield, Loader2, Eye, ChevronRight, Menu, X, Upload, FileUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { GenerateReportDialog } from "@/components/reports/GenerateReportDialog";
 
 // SA Regulatory Report Types
 const SA_REPORT_TYPES = {
@@ -106,6 +106,9 @@ const Reports = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
   const [generatingReportId, setGeneratingReportId] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [reports, setReports] = useState(mockReports);
 
   const getTimeAgo = () => {
     const seconds = Math.floor((new Date().getTime() - lastUpdated.getTime()) / 1000);
@@ -131,143 +134,51 @@ const Reports = () => {
     try {
       const doc = new jsPDF();
       
-      // Add watermark
-      doc.setTextColor(200, 200, 200);
-      doc.setFontSize(60);
-      doc.text("CONFIDENTIAL", 40, 140, { angle: 45 });
-      doc.setTextColor(0, 0, 0);
-      
-      // Add header
-      doc.setFillColor(13, 71, 161);
-      doc.rect(0, 0, 210, 40, 'F');
-      
-      // Title
+      // Header
+      doc.setFillColor(26, 54, 93);
+      doc.rect(0, 0, 210, 40, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
-      doc.text(report.type.toUpperCase() + " REPORT", 105, 25, { align: 'center' });
-      
-      doc.setFontSize(10);
-      doc.text("Project ZAR Compliance System", 105, 35, { align: 'center' });
-      
-      // Reset text color
+      doc.text("PROJECT ZAR", 20, 25);
+      doc.setFontSize(12);
+      doc.text(report.type, 20, 35);
+
+      // Report info
       doc.setTextColor(0, 0, 0);
-      
-      let yPosition = 50;
-      
-      // Report Information
-      doc.setFontSize(16);
-      doc.text("REPORT INFORMATION", 20, yPosition);
-      yPosition += 10;
-      
+      doc.setFontSize(18);
+      doc.text(report.title, 20, 55);
+      doc.setFontSize(12);
+      doc.text(`Generated: ${report.date}`, 20, 65);
+      doc.text(`Status: ${report.status}`, 20, 75);
+
+      // Content
+      doc.setFontSize(14);
+      doc.text("Executive Summary", 20, 95);
       doc.setFontSize(11);
-      doc.text(`Title: ${report.title}`, 20, yPosition);
-      yPosition += 8;
-      
-      doc.text(`Report ID: REP-${report.id}-${Date.now().toString().slice(-6)}`, 20, yPosition);
-      doc.text(`Generated: ${new Date().toLocaleString('en-ZA')}`, 120, yPosition);
-      yPosition += 8;
-      
-      doc.text(`Jurisdiction: ${report.jurisdiction}`, 20, yPosition);
-      doc.text(`Status: ${report.status.toUpperCase()}`, 120, yPosition);
-      yPosition += 15;
-      
-      // Report Summary
-      doc.setFontSize(16);
-      doc.text("EXECUTIVE SUMMARY", 20, yPosition);
-      yPosition += 10;
-      
+      doc.setTextColor(60, 60, 60);
+      doc.text(report.description, 20, 105, { maxWidth: 170 });
+
+      // Metrics
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
+      doc.text("Key Metrics", 20, 130);
       doc.setFontSize(11);
-      const summary = report.description || `This report contains ${report.type.toLowerCase()} analysis for compliance monitoring.`;
-      const splitText = doc.splitTextToSize(summary, 170);
-      doc.text(splitText, 20, yPosition);
-      yPosition += splitText.length * 5 + 10;
-      
-      // Key Metrics
-      doc.setFontSize(16);
-      doc.text("KEY METRICS", 20, yPosition);
-      yPosition += 10;
-      
-      const metricsBody = [
-        ['Report Type', report.type],
-        ['Generation Date', report.date],
-        ['Customer Count', report.customerCount?.toString() || 'N/A'],
-        ['High Risk Entities', report.highRisk?.toString() || 'N/A'],
-        ['Jurisdiction', report.jurisdiction],
-        ['File Size', report.size],
-      ];
-      
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Metric', 'Value']],
-        body: metricsBody,
-        theme: 'grid',
-        headStyles: { fillColor: [13, 71, 161] },
-        margin: { left: 20, right: 20 },
-      });
-      
-      yPosition = (doc as any).lastAutoTable.finalY + 15;
-      
-      // SA Regulatory Compliance Notice
-      if (report.jurisdiction === "SA") {
-        doc.setFontSize(16);
-        doc.text("SOUTH AFRICAN REGULATORY COMPLIANCE", 20, yPosition);
-        yPosition += 10;
-        
-        doc.setFontSize(11);
-        const complianceNotice = "This report is generated in compliance with South African regulatory requirements including:\n" +
-                                "• Financial Intelligence Centre Act, 2001 (Act No. 38 of 2001)\n" +
-                                "• Protection of Personal Information Act, 2013 (Act No. 4 of 2013)\n" +
-                                "• Regulation of Interception of Communications Act, 2002\n" +
-                                "• FATF Recommendations on virtual assets";
-        
-        const complianceText = doc.splitTextToSize(complianceNotice, 170);
-        doc.text(complianceText, 20, yPosition);
-        yPosition += complianceText.length * 5 + 15;
-      }
-      
-      // Recommendations
-      doc.setFontSize(16);
-      doc.text("RECOMMENDED ACTIONS", 20, yPosition);
-      yPosition += 10;
-      
-      doc.setFontSize(11);
-      const recommendations = [
-        "Review report findings with compliance team",
-        "Update customer risk assessments accordingly",
-        "File SAR with FIC if high-risk activity detected",
-        "Schedule follow-up monitoring as required",
-        "Document all findings in compliance records"
-      ];
-      
-      recommendations.forEach((rec, index) => {
-        if (yPosition > 270) {
-          doc.addPage();
-          yPosition = 20;
-        }
-        doc.text(`• ${rec}`, 25, yPosition);
-        yPosition += 7;
-      });
-      
-      // Add page numbers
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text(
-          `Page ${i} of ${pageCount} • Project ZAR Compliance System • ${new Date().toLocaleDateString('en-ZA')}`,
-          105,
-          290,
-          { align: 'center' }
-        );
-      }
-      
-      // Save the PDF
-      const fileName = `${report.type.replace(/\s+/g, '_')}_${report.id}_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
+      doc.text(`• Customers Analyzed: ${report.customerCount}`, 25, 145);
+      doc.text(`• High Risk Customers: ${report.highRisk}`, 25, 155);
+      doc.text(`• Jurisdiction: ${report.jurisdiction}`, 25, 165);
+      doc.text(`• Report Size: ${report.size}`, 25, 175);
+
+      // Footer
+      doc.setFontSize(9);
+      doc.setTextColor(128, 128, 128);
+      doc.text("Confidential - PROJECT ZAR Banking Compliance Dashboard", 20, 280);
+      doc.text("South African Regulatory Compliance System", 20, 285);
+      doc.text(new Date().toLocaleDateString(), 180, 280);
+
+      // Save PDF
+      doc.save(`${report.title.replace(/\s+/g, "_")}.pdf`);
       
       toast.success(`${report.type} PDF generated successfully!`);
-      
     } catch (error) {
       console.error('PDF generation error:', error);
       toast.error("Failed to generate PDF report");
@@ -284,86 +195,46 @@ const Reports = () => {
       const doc = new jsPDF();
       
       // SAR Form Header
-      doc.setFillColor(183, 28, 28);
-      doc.rect(0, 0, 210, 40, 'F');
+      doc.setFillColor(183, 28, 28); // Red for urgent
+      doc.rect(0, 0, 210, 40, "F");
       
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.text("SUSPICIOUS ACTIVITY REPORT", 105, 25, { align: 'center' });
       
       doc.setFontSize(10);
-      doc.text("FIC Form SAA-1 (Section 29, FIC Act)", 105, 35, { align: 'center' });
+      doc.text("Financial Intelligence Centre - South Africa", 105, 35, { align: 'center' });
       
-      let yPosition = 50;
-      
-      // Form fields
+      // Form content
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
+      let y = 50;
       
-      const formFields = [
-        ['Reporting Institution', 'Project ZAR Compliance System'],
-        ['Report Reference', `SAR-${report.id}-${Date.now().toString().slice(-6)}`],
-        ['Date of Report', new Date().toLocaleDateString('en-ZA')],
-        ['Report Title', report.title],
-        ['Customer Count', report.customerCount?.toString() || 'Multiple'],
-        ['High Risk Count', report.highRisk?.toString() || 'All'],
-        ['Reason for Filing', 'High-risk crypto activity requiring FIC notification'],
+      const fields = [
+        ['Report Reference', `SAR-FNB-${report.id}-${report.date.replace(/-/g, '')}`],
+        ['Date', new Date().toLocaleDateString('en-ZA')],
+        ['Subject', `${report.title}`],
+        ['Customers Involved', report.customerCount],
+        ['High Risk Individuals', report.highRisk],
+        ['Description', report.description],
+        ['Jurisdiction', report.jurisdiction],
+        ['Status', 'HIGH PRIORITY - FIC SUBMISSION REQUIRED'],
       ];
       
-      formFields.forEach(([label, value], index) => {
-        doc.text(`${label}:`, 20, yPosition);
-        doc.setFont(undefined, 'bold');
-        doc.text(value, 80, yPosition);
-        doc.setFont(undefined, 'normal');
-        yPosition += 10;
+      fields.forEach(([label, value]) => {
+        doc.text(`${label}:`, 20, y);
+        doc.text(value.toString(), 80, y);
+        y += 10;
       });
       
-      yPosition += 10;
+      // Legal notice
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text('CONFIDENTIAL: Protected under Section 38 of the FIC Act', 20, 250);
       
-      // Narrative Section
-      doc.setFontSize(14);
-      doc.text("NARRATIVE DESCRIPTION", 20, yPosition);
-      yPosition += 10;
-      
-      doc.setFontSize(11);
-      const narrative = `This SAR is filed in compliance with Section 29 of the Financial Intelligence Centre Act, 2001. ` +
-                       `The report identifies ${report.highRisk || 'multiple'} high-risk customer(s) with suspicious crypto activity patterns ` +
-                       `including undeclared wallets and unusual transaction behavior requiring FIC attention.`;
-      
-      doc.text(narrative, 20, yPosition, { maxWidth: 170 });
-      yPosition += 40;
-      
-      // Signature
-      doc.setFontSize(12);
-      doc.text("AUTHORIZED SIGNATORY", 20, yPosition);
-      yPosition += 20;
-      
-      doc.text("_________________________", 50, yPosition);
-      doc.text("Signature", 65, yPosition + 10);
-      
-      doc.text("_________________________", 120, yPosition);
-      doc.text("Date", 140, yPosition + 10);
-      
-      // Footer
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text(
-          `Confidential - For FIC submission only • Page ${i} of ${pageCount}`,
-          105,
-          290,
-          { align: 'center' }
-        );
-      }
-      
-      // Save SAR
-      const fileName = `SAR_Submission_${report.id}_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
+      // Save PDF
+      doc.save(`SAR_${report.id}_FIC_Submission.pdf`);
       
       toast.success("SAR Form generated for FIC submission!");
-      
     } catch (error) {
       console.error('SAR PDF generation error:', error);
       toast.error("Failed to generate SAR form");
@@ -381,25 +252,69 @@ const Reports = () => {
   };
 
   const handlePreview = (report: any) => {
-    toast.info(`Preview feature coming soon for: ${report.title}`);
-    // In production: Open PDF in new tab for preview
+    if (report.status !== "completed") {
+      toast.error(`Report is still ${report.status}. Please wait for completion.`);
+      return;
+    }
+    
+    // Generate preview PDF
+    try {
+      const doc = new jsPDF();
+      
+      // Simple preview version
+      doc.setFontSize(16);
+      doc.text(`Preview: ${report.title}`, 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Type: ${report.type}`, 20, 45);
+      doc.text(`Date: ${report.date}`, 20, 55);
+      doc.text(`Status: ${report.status}`, 20, 65);
+      
+      // Open in new tab
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      
+      toast.info(`Opening ${report.title} in new tab`);
+    } catch (error) {
+      toast.error("Failed to preview report");
+    }
   };
 
   const handleGenerateReport = () => {
-    toast.info("Opening report generation wizard...");
-    // Would open a modal to configure report parameters
+    setDialogOpen(true);
   };
 
   const handleSubmitToFIC = (report: any) => {
     if (report.type === "Suspicious Activity Report") {
       toast.warning(`Submitting SAR ${report.id} to Financial Intelligence Centre...`);
-      // In production: Open SAR submission workflow
       generateSARPDF(report);
     }
   };
 
+  const handleReportGenerated = (newReport: { title: string; type: string; date: string; status: string }) => {
+    // Create a new report object with mock data
+    const generatedReport = {
+      id: reports.length + 1,
+      title: newReport.title,
+      type: newReport.type,
+      date: newReport.date,
+      status: newReport.status,
+      customerCount: Math.floor(Math.random() * 100) + 10,
+      highRisk: Math.floor(Math.random() * 20) + 1,
+      jurisdiction: "SA",
+      size: "1.5 MB",
+      description: `Automatically generated ${newReport.type.toLowerCase()} report`,
+      urgent: newReport.type === "Suspicious Activity Report",
+    };
+    
+    // Add to the beginning of the reports list
+    setReports(prev => [generatedReport, ...prev]);
+    
+    toast.success(`New report "${newReport.title}" has been added`);
+  };
+
   // Filter reports based on search and filters
-  const filteredReports = mockReports.filter(report => {
+  const filteredReports = reports.filter(report => {
     const matchesSearch = searchQuery === "" || 
       report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       report.type.toLowerCase().includes(searchQuery.toLowerCase());
@@ -413,366 +328,480 @@ const Reports = () => {
 
   // Calculate statistics
   const stats = {
-    totalReports: mockReports.length,
-    saReports: mockReports.filter(r => r.jurisdiction === "SA").length,
-    urgentReports: mockReports.filter(r => r.urgent).length,
-    totalCustomers: mockReports.reduce((sum, r) => sum + (typeof r.customerCount === 'number' ? r.customerCount : 0), 0),
-    highRiskCustomers: mockReports.reduce((sum, r) => sum + (typeof r.highRisk === 'number' ? r.highRisk : 0), 0),
+    totalReports: reports.length,
+    saReports: reports.filter(r => r.jurisdiction === "SA").length,
+    urgentReports: reports.filter(r => r.urgent).length,
+    totalCustomers: reports.reduce((sum, r) => sum + (typeof r.customerCount === 'number' ? r.customerCount : 0), 0),
+    highRiskCustomers: reports.reduce((sum, r) => sum + (typeof r.highRisk === 'number' ? r.highRisk : 0), 0),
   };
 
   return (
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
-      <main className="flex-1 ml-0 md:ml-[280px] transition-all">
-        <header className="sticky top-0 z-10 glass-card border-b border-border/50 backdrop-blur-md px-6 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FileText className="w-6 h-6 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold">Compliance Reports</h1>
-                <p className="text-sm text-muted-foreground">South African Regulatory Reporting</p>
+      {/* Main Content Area - Fixed for mobile centering */}
+      <main className="flex-1 md:ml-[280px] transition-all w-full">
+        {/* Mobile Header with Menu Button */}
+        <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center justify-between w-full md:w-auto">
+              <div className="flex items-center gap-3">
+                <div className="md:hidden">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="h-9 w-9"
+                  >
+                    {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  </Button>
+                </div>
+                <div className="md:hidden flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-primary" />
+                  </div>
+                  <h1 className="text-xl font-bold">Reports</h1>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold">Compliance Reports</h1>
+                    <p className="text-sm text-muted-foreground hidden md:block">
+                      South African Regulatory Reporting
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="md:hidden">
+                <Button 
+                  onClick={handleGenerateReport} 
+                  className="gap-2 text-sm h-9"
+                  size="sm"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>New</span>
+                </Button>
               </div>
             </div>
-            <Button onClick={handleGenerateReport} className="gap-2">
-              <FileText className="w-4 h-4" />
-              Generate New Report
-            </Button>
+            
+            <div className="hidden md:flex items-center gap-2">
+              <Button 
+                onClick={handleGenerateReport} 
+                className="gap-2 text-sm md:text-base h-9 md:h-10"
+                size="sm"
+              >
+                <FileText className="w-4 h-4" />
+                <span>New Report</span>
+              </Button>
+            </div>
           </div>
         </header>
 
-        <div className="p-6 space-y-6">
-          {/* SA Compliance Stats */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Reports</p>
-                    <p className="text-3xl font-bold">{stats.totalReports}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stats.saReports} SA specific</p>
+        {/* Content Container - Properly centered on mobile */}
+        <div className="w-full max-w-full overflow-x-hidden">
+          {/* SA Compliance Stats - Mobile Stacked */}
+          <div className="px-4 md:px-6 pt-4 md:pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <Card className="glass-card border-border/50">
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm text-muted-foreground">Total Reports</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.totalReports}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{stats.saReports} SA specific</p>
+                    </div>
+                    <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                   </div>
-                  <FileText className="w-10 h-10 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="glasscard border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Customers Analyzed</p>
-                    <p className="text-3xl font-bold">{stats.totalCustomers}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stats.highRiskCustomers} high risk</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card border-border/50">
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm text-muted-foreground">Customers Analyzed</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.totalCustomers}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{stats.highRiskCustomers} high risk</p>
+                    </div>
+                    <Building className="w-6 h-6 md:w-8 md:h-8 text-warning" />
                   </div>
-                  <Building className="w-10 h-10 text-warning" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">SAR Ready</p>
-                    <p className="text-3xl font-bold">{stats.urgentReports}</p>
-                    <p className="text-xs text-muted-foreground mt-1">For FIC submission</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card border-border/50">
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm text-muted-foreground">SAR Ready</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.urgentReports}</p>
+                      <p className="text-xs text-muted-foreground mt-1">For FIC submission</p>
+                    </div>
+                    <AlertTriangle className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                   </div>
-                  <AlertTriangle className="w-10 h-10 text-destructive" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Regulatory Frameworks</p>
-                    <p className="text-3xl font-bold">4</p>
-                    <p className="text-xs text-muted-foreground mt-1">FIC, RICA, FATF, POPIA</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card border-border/50">
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm text-muted-foreground">Regulatory Frameworks</p>
+                      <p className="text-xl md:text-2xl font-bold">4</p>
+                      <p className="text-xs text-muted-foreground mt-1">FIC, RICA, FATF, POPIA</p>
+                    </div>
+                    <Shield className="w-6 h-6 md:w-8 md:h-8 text-success" />
                   </div>
-                  <Shield className="w-10 h-10 text-success" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Filters */}
-          <Card className="glass-card border-border/50">
-            <CardHeader>
-              <CardTitle>Report Filters</CardTitle>
-              <CardDescription>Filter compliance reports by type, status, and jurisdiction</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
+          {/* Main Content */}
+          <div className="p-4 md:p-6">
+            {/* Filters Card */}
+            <Card className="glass-card border-border/50 mb-4 md:mb-6">
+              <CardHeader className="border-b border-border/50 p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-lg md:text-xl">Report Filters</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Filter compliance reports by type, status, and jurisdiction
+                    </CardDescription>
+                  </div>
+                  <Badge variant="outline" className="text-xs md:text-sm border-border w-fit">
+                    {filteredReports.length} of {reports.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col gap-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder="Search reports by title or type..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-muted/50 text-sm md:text-base"
                     />
                   </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <Filter className="w-4 h-4 mr-2" />
-                      <SelectValue placeholder="Report Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="FICA Compliance">FICA Compliance</SelectItem>
-                      <SelectItem value="Suspicious Activity Report">SAR</SelectItem>
-                      <SelectItem value="RICA Monitoring">RICA Monitoring</SelectItem>
-                      <SelectItem value="FATF Travel Rule">FATF Travel Rule</SelectItem>
-                      <SelectItem value="Risk Assessment">Risk Assessment</SelectItem>
-                    </SelectContent>
-                  </Select>
                   
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
-                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Jurisdiction" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Jurisdictions</SelectItem>
-                      <SelectItem value="SA">South Africa</SelectItem>
-                      <SelectItem value="International">International</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mt-4">
-                <Badge 
-                  variant="outline" 
-                  className="cursor-pointer hover:bg-primary/10"
-                  onClick={() => {
-                    setReportTypeFilter("all");
-                    setStatusFilter("all");
-                    setJurisdictionFilter("all");
-                    setSearchQuery("");
-                  }}
-                >
-                  Clear Filters
-                </Badge>
-                <Badge variant="secondary">
-                  Showing {filteredReports.length} of {mockReports.length} reports
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reports Table */}
-          <Card className="glass-card border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Compliance Reports</CardTitle>
-                  <CardDescription>View, download, and submit regulatory reports</CardDescription>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Updated: {getTimeAgo()}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {filteredReports.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No reports found</h3>
-                  <p className="text-muted-foreground">Try adjusting your filters or search query</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredReports.map((report) => {
-                    const statusBadge = getStatusBadge(report.status);
-                    const isGenerating = generatingReportId === report.id;
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div>
+                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Report Type</label>
+                      <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+                        <SelectTrigger className="text-sm md:text-base w-full">
+                          <Filter className="w-4 h-4 mr-2 hidden sm:block" />
+                          <SelectValue placeholder="All Types" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="FICA Compliance">FICA Compliance</SelectItem>
+                          <SelectItem value="Suspicious Activity Report">SAR</SelectItem>
+                          <SelectItem value="RICA Monitoring">RICA Monitoring</SelectItem>
+                          <SelectItem value="FATF Travel Rule">FATF Travel Rule</SelectItem>
+                          <SelectItem value="Risk Assessment">Risk Assessment</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     
-                    return (
-                      <div
-                        key={report.id}
-                        className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg glass-card border border-border/50 hover-lift gap-4"
-                      >
-                        <div className="flex items-start gap-4 flex-1">
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                            report.type === "Suspicious Activity Report" ? "bg-destructive/20" :
-                            report.type === "FICA Compliance" ? "bg-primary/20" :
-                            "bg-warning/20"
-                          }`}>
-                            {report.type === "Suspicious Activity Report" ? (
-                              <AlertTriangle className="w-6 h-6 text-destructive" />
-                            ) : report.type === "FICA Compliance" ? (
-                              <Shield className="w-6 h-6 text-primary" />
-                            ) : (
-                              <FileText className="w-6 h-6 text-warning" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold">{report.title}</h3>
-                              {report.urgent && (
-                                <Badge variant="destructive" className="text-xs">URGENT</Badge>
-                              )}
-                              {report.confidential && (
-                                <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
-                                  CONFIDENTIAL
-                                </Badge>
+                    <div>
+                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Status</label>
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="text-sm md:text-base w-full">
+                          <SelectValue placeholder="All Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="processing">Processing</SelectItem>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Jurisdiction</label>
+                      <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
+                        <SelectTrigger className="text-sm md:text-base w-full">
+                          <SelectValue placeholder="All Jurisdictions" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Jurisdictions</SelectItem>
+                          <SelectItem value="SA">South Africa</SelectItem>
+                          <SelectItem value="International">International</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setReportTypeFilter("all");
+                        setStatusFilter("all");
+                        setJurisdictionFilter("all");
+                        setSearchQuery("");
+                      }}
+                      className="text-xs md:text-sm h-8"
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reports List */}
+            <Card className="glass-card border-border/50">
+              <CardHeader className="border-b border-border/50 p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-lg md:text-xl">Compliance Reports</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      View, download, and submit regulatory reports
+                    </CardDescription>
+                  </div>
+                  <div className="text-xs md:text-sm text-muted-foreground">
+                    Updated: {getTimeAgo()}
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="p-4 md:p-6">
+                {filteredReports.length === 0 ? (
+                  <div className="text-center py-8 md:py-12">
+                    <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground/30 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No reports found</h3>
+                    <p className="text-muted-foreground text-sm md:text-base">Try adjusting your filters or search query</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 md:space-y-4">
+                    {filteredReports.map((report) => {
+                      const statusBadge = getStatusBadge(report.status);
+                      const isGenerating = generatingReportId === report.id;
+                      
+                      return (
+                        <div
+                          key={report.id}
+                          className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 hover-lift transition-all cursor-pointer"
+                        >
+                          {/* Report Info - Mobile Stacked */}
+                          <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-0 flex-1">
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center border-2 border-background flex-shrink-0 ${
+                              report.type === "Suspicious Activity Report" ? "bg-destructive/20" :
+                              report.type === "FICA Compliance" ? "bg-primary/20" :
+                              "bg-warning/20"
+                            }`}>
+                              {report.type === "Suspicious Activity Report" ? (
+                                <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-destructive" />
+                              ) : report.type === "FICA Compliance" ? (
+                                <Shield className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                              ) : (
+                                <FileText className="w-5 h-5 md:w-6 md:h-6 text-warning" />
                               )}
                             </div>
-                            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <FileText className="w-3 h-3" />
-                                {report.type}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {report.date}
-                              </span>
-                              <span>• {report.size}</span>
-                              <span>• Jurisdiction: {report.jurisdiction}</span>
-                              {typeof report.customerCount === 'number' && (
-                                <span>• Customers: {report.customerCount}</span>
-                              )}
-                              {typeof report.highRisk === 'number' && (
-                                <span className="text-destructive">• High Risk: {report.highRisk}</span>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-                              {report.description}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                          <div className="text-right hidden md:block">
-                            <Badge className={statusBadge.class}>
-                              <span className="mr-1">{statusBadge.icon}</span>
-                              {report.status.toUpperCase()}
-                            </Badge>
-                            {report.jurisdiction === "SA" && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                SA Regulation
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                                <h3 className="font-semibold text-sm md:text-base truncate">
+                                  {report.title}
+                                </h3>
+                                <div className="flex flex-wrap gap-1">
+                                  {report.urgent && (
+                                    <Badge variant="destructive" className="text-xs px-1.5 py-0.5">URGENT</Badge>
+                                  )}
+                                  {report.confidential && (
+                                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-destructive/50 text-destructive">
+                                      CONFIDENTIAL
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
-                            )}
+                              
+                              {/* Mobile Info - Compact */}
+                              <div className="space-y-1 md:space-y-2">
+                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <FileText className="w-3 h-3 flex-shrink-0" />
+                                    <span className="truncate max-w-[100px] md:max-w-none">{report.type}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    <span>{report.date}</span>
+                                  </div>
+                                  
+                                  <Badge className={`text-xs px-1.5 py-0 ${statusBadge.class}`}>
+                                    {report.status.toUpperCase()}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="text-xs text-muted-foreground line-clamp-2 md:line-clamp-1">
+                                  {report.description}
+                                </div>
+                                
+                                {/* Mobile Details */}
+                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground md:hidden">
+                                  <span>• {report.size}</span>
+                                  <span>• {report.jurisdiction}</span>
+                                  {typeof report.customerCount === 'number' && (
+                                    <span>• {report.customerCount} customers</span>
+                                  )}
+                                  {typeof report.highRisk === 'number' && (
+                                    <span className="text-destructive">• {report.highRisk} high risk</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handlePreview(report)}
-                              disabled={report.status !== "completed"}
-                              className="gap-2"
-                              title={report.status !== "completed" ? "Report still processing" : "Preview report"}
-                            >
-                              <Eye className="w-4 h-4" />
-                              Preview
-                            </Button>
-                            
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDownload(report)}
-                              disabled={report.status !== "completed" || isGenerating}
-                              className="gap-2"
-                              title={report.status !== "completed" ? "Report still processing" : "Download PDF"}
-                            >
-                              {isGenerating ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Download className="w-4 h-4" />
+                          {/* Actions & Details - Mobile Bottom Row */}
+                          <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4 border-t border-border/30 md:border-0 pt-3 md:pt-0">
+                            {/* Desktop Details */}
+                            <div className="hidden md:flex flex-col items-end text-sm text-muted-foreground">
+                              <span>{report.size}</span>
+                              <span>{report.jurisdiction}</span>
+                              {typeof report.customerCount === 'number' && (
+                                <span>{report.customerCount} customers</span>
                               )}
-                              PDF
-                            </Button>
+                              {typeof report.highRisk === 'number' && (
+                                <span className="text-destructive">{report.highRisk} high risk</span>
+                              )}
+                            </div>
                             
-                            {report.type === "Suspicious Activity Report" && report.status === "completed" && (
+                            <div className="flex items-center gap-2">
                               <Button
                                 size="sm"
-                                variant="destructive"
-                                onClick={() => handleSubmitToFIC(report)}
-                                className="gap-2"
-                                title="Submit to Financial Intelligence Centre"
+                                variant="ghost"
+                                onClick={() => handlePreview(report)}
+                                disabled={report.status !== "completed"}
+                                className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                                title={report.status !== "completed" ? "Report still processing" : "Preview report"}
                               >
-                                <AlertTriangle className="w-4 h-4" />
-                                Submit to FIC
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden md:inline ml-1">Preview</span>
                               </Button>
-                            )}
+                              
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDownload(report)}
+                                disabled={report.status !== "completed" || isGenerating}
+                                className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                                title={report.status !== "completed" ? "Report still processing" : "Download PDF"}
+                              >
+                                {isGenerating ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Download className="w-4 h-4" />
+                                )}
+                                <span className="hidden md:inline ml-1">PDF</span>
+                              </Button>
+                              
+                              {report.type === "Suspicious Activity Report" && report.status === "completed" && (
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleSubmitToFIC(report)}
+                                  className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                                  title="Submit to Financial Intelligence Centre"
+                                >
+                                  <FileUp className="w-4 h-4" />
+                                  <span className="hidden md:inline ml-1">FIC</span>
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                )}
+                
+                {/* Footer */}
+                <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-border/50 flex flex-col md:flex-row md:items-center justify-between text-sm text-muted-foreground gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-success"></div>
+                    <span className="text-xs md:text-sm">
+                      South African Regulatory Compliance System
+                    </span>
+                  </div>
+                  <span className="text-xs md:text-sm">
+                    {filteredReports.length} reports displayed
+                  </span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Regulatory Information */}
-          <Card className="glass-card border-border/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
-                South African Regulatory Framework
-              </CardTitle>
-              <CardDescription>Reports are generated in compliance with SA regulations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <h4 className="font-semibold">Mandatory Reports</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-destructive"></div>
-                      <span><strong>Suspicious Activity Reports (SAR):</strong> Required within 7 days of detection (FIC Act Section 29)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      <span><strong>FICA Compliance Reports:</strong> Annual compliance reporting requirements</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-warning"></div>
-                      <span><strong>RICA Transaction Reports:</strong> Communication monitoring as per RICA Act</span>
-                    </li>
-                  </ul>
+            {/* Regulatory Information */}
+            <Card className="glass-card border-border/50 mt-4 md:mt-6">
+              <CardHeader className="border-b border-border/50 p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-primary" />
+                      South African Regulatory Framework
+                    </CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Reports are generated in compliance with SA regulations
+                    </CardDescription>
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <h4 className="font-semibold">Report Retention</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span><strong>SAR Reports:</strong> 5 years minimum retention</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span><strong>FICA Records:</strong> 5 years from termination of business relationship</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span><strong>Transaction Records:</strong> 5 years as per FIC Act</span>
-                    </li>
-                  </ul>
+              </CardHeader>
+              <CardContent className="p-4 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm md:text-base">Mandatory Reports</h4>
+                    <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <div className="w-2 h-2 rounded-full bg-destructive mt-1.5 flex-shrink-0"></div>
+                        <span><strong>Suspicious Activity Reports (SAR):</strong> Required within 7 days of detection (FIC Act Section 29)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                        <span><strong>FICA Compliance Reports:</strong> Annual compliance reporting requirements</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-2 h-2 rounded-full bg-warning mt-1.5 flex-shrink-0"></div>
+                        <span><strong>RICA Transaction Reports:</strong> Communication monitoring as per RICA Act</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm md:text-base">Report Retention</h4>
+                    <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span><strong>SAR Reports:</strong> 5 years minimum retention</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span><strong>FICA Records:</strong> 5 years from termination of business relationship</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <span><strong>Transaction Records:</strong> 5 years as per FIC Act</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
+
+      {/* Generate Report Dialog */}
+      <GenerateReportDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onReportGenerated={handleReportGenerated}
+      />
     </div>
   );
 };
