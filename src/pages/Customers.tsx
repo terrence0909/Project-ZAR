@@ -15,9 +15,10 @@ import {
   Coins,
   Shield,
   Mail,
-  Phone,
   FileText,
-  AlertTriangle
+  ChevronRight,
+  Menu,
+  X
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -179,8 +180,7 @@ const Customers = () => {
       
       return date.toLocaleDateString('en-ZA', { 
         day: 'numeric',
-        month: 'short',
-        year: 'numeric'
+        month: 'short'
       });
     } catch {
       return dateString;
@@ -226,94 +226,104 @@ const Customers = () => {
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated="Just now" />
       
-      <main className="flex-1 ml-0 md:ml-[280px] transition-all">
-        {/* Header */}
-        <header className="sticky top-0 z-10 glass-card border-b border-border/50 backdrop-blur-md px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Users className="w-5 h-5 text-primary" />
+      <main className="flex-1 md:ml-[280px] transition-all pt-16 md:pt-0">
+        {/* Header - Mobile Responsive */}
+        <header className="sticky top-0 z-10 glass-card border-b border-border/50 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center justify-between md:justify-start gap-3">
+              <div className="md:hidden flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-primary" />
+                </div>
+                <h1 className="text-xl font-bold">Customers</h1>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Customers</h1>
-                <p className="text-sm text-muted-foreground">
-                  Real customer data from your XML imports
-                </p>
+              <div className="hidden md:flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Customers</h1>
+                  <p className="text-sm text-muted-foreground hidden md:block">
+                    Real customer data from your XML imports
+                  </p>
+                </div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={fetchCustomers}
-                disabled={refreshing}
-                className="gap-2"
-              >
-                <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-                {refreshing ? "Refreshing..." : "Refresh"}
-              </Button>
-              
-              <div className="relative">
+            <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:flex-none md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search customers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64 bg-muted/50"
+                  className="pl-10 bg-muted/50 text-sm md:text-base"
                 />
               </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchCustomers}
+                disabled={refreshing}
+                className="h-9 w-9 md:h-10 md:w-auto md:gap-2 ml-2"
+              >
+                <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+                <span className="hidden md:inline">
+                  {refreshing ? "Refreshing..." : "Refresh"}
+                </span>
+              </Button>
             </div>
           </div>
         </header>
 
-        {/* Stats Cards */}
-        <div className="px-6 pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Stats Cards - Mobile Stacked */}
+        <div className="px-3 md:px-6 pt-4 md:pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
             <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
+              <CardContent className="p-3 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Customers</p>
-                    <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">Total</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.total}</p>
                   </div>
-                  <Users className="w-8 h-8 text-primary" />
+                  <Users className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
             
             <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
+              <CardContent className="p-3 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Low Risk</p>
-                    <p className="text-2xl font-bold text-success">{stats.low}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">Low Risk</p>
+                    <p className="text-xl md:text-2xl font-bold text-success">{stats.low}</p>
                   </div>
-                  <Shield className="w-8 h-8 text-success" />
+                  <Shield className="w-6 h-6 md:w-8 md:h-8 text-success" />
                 </div>
               </CardContent>
             </Card>
             
             <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
+              <CardContent className="p-3 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Medium Risk</p>
-                    <p className="text-2xl font-bold text-warning">{stats.medium}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">Medium</p>
+                    <p className="text-xl md:text-2xl font-bold text-warning">{stats.medium}</p>
                   </div>
-                  <Shield className="w-8 h-8 text-warning" />
+                  <Shield className="w-6 h-6 md:w-8 md:h-8 text-warning" />
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="glass-card border-border/50">
-              <CardContent className="pt-6">
+            <Card className="glasscard border-border/50">
+              <CardContent className="p-3 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">High Risk</p>
-                    <p className="text-2xl font-bold text-destructive">{stats.high}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">High Risk</p>
+                    <p className="text-xl md:text-2xl font-bold text-destructive">{stats.high}</p>
                   </div>
-                  <Shield className="w-8 h-8 text-destructive" />
+                  <Shield className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                 </div>
               </CardContent>
             </Card>
@@ -321,18 +331,18 @@ const Customers = () => {
         </div>
 
         {/* Main Content */}
-        <div className="p-6">
+        <div className="p-3 md:p-6">
           <Card className="glass-card border-border/50">
-            <CardHeader className="border-b border-border/50">
-              <div className="flex items-center justify-between">
+            <CardHeader className="border-b border-border/50 p-4 md:p-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-foreground">Customer Directory</CardTitle>
-                  <CardDescription>
-                    Manage and monitor customer risk profiles from imported data
+                  <CardTitle className="text-lg md:text-xl">Customer Directory</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Manage and monitor customer risk profiles
                     {searchTerm && ` • Found ${filteredCustomers.length} customers`}
                   </CardDescription>
                 </div>
-                <Badge variant="outline" className="text-sm border-border">
+                <Badge variant="outline" className="text-xs md:text-sm border-border w-fit">
                   <div className={cn(
                     "w-2 h-2 rounded-full mr-2",
                     customers.length > 0 ? "bg-success" : "bg-warning"
@@ -342,37 +352,33 @@ const Customers = () => {
               </div>
             </CardHeader>
             
-            <CardContent className="pt-6">
+            <CardContent className="p-4 md:p-6">
               {loading ? (
-                <div className="flex flex-col items-center justify-center h-64">
+                <div className="flex flex-col items-center justify-center h-48 md:h-64">
                   <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                  <p className="text-muted-foreground">Loading customer data...</p>
+                  <p className="text-muted-foreground text-sm md:text-base">Loading customer data...</p>
                 </div>
               ) : customers.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileText className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    No customers found
-                  </h3>
-                  <p className="text-muted-foreground mb-6">
+                <div className="text-center py-8 md:py-12">
+                  <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No customers found</h3>
+                  <p className="text-muted-foreground mb-6 text-sm md:text-base">
                     Import your XML data to see customers here
                   </p>
                   <Button 
                     variant="outline" 
                     onClick={fetchCustomers}
-                    className="gap-2"
+                    className="gap-2 text-sm md:text-base"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Retry Connection
                   </Button>
                 </div>
               ) : filteredCustomers.length === 0 ? (
-                <div className="text-center py-12">
-                  <Search className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    No matching customers
-                  </h3>
-                  <p className="text-muted-foreground">
+                <div className="text-center py-8 md:py-12">
+                  <Search className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No matching customers</h3>
+                  <p className="text-muted-foreground text-sm md:text-base">
                     Try a different search term
                   </p>
                 </div>
@@ -382,17 +388,17 @@ const Customers = () => {
                     <div
                       key={customer.id}
                       onClick={() => handleCustomerClick(customer.customerId || customer.id, customer.name)}
-                      className="group flex items-center justify-between p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 hover-lift transition-all cursor-pointer"
+                      className="group flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 hover-lift transition-all cursor-pointer"
                     >
-                      {/* Customer Info */}
-                      <div className="flex items-center gap-4">
+                      {/* Customer Info - Mobile Stacked */}
+                      <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-0">
                         <div className="relative">
-                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-background">
-                            <User className="w-6 h-6 text-primary" />
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-background">
+                            <User className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                           </div>
                           <Badge 
                             className={cn(
-                              "absolute -top-1 -right-1 px-2 py-0.5 text-xs",
+                              "absolute -top-1 -right-1 px-1.5 py-0 text-xs md:px-2 md:py-0.5",
                               getRiskBadge(customer.riskLevel)
                             )}
                           >
@@ -400,85 +406,95 @@ const Customers = () => {
                           </Badge>
                         </div>
                         
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-foreground">{customer.name}</h3>
-                            <Badge variant="outline" className={getKycBadge(customer.kycStatus)}>
-                              {customer.kycStatus}
-                            </Badge>
-                            {customer.saId && (
-                              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                                ID: {customer.saId}
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Coins className="w-3 h-3" />
-                              <span className="font-mono">{truncateAddress(customer.walletAddress)}</span>
-                            </div>
-                            
-                            {customer.country && (
-                              <div className="flex items-center gap-1">
-                                <Globe className="w-3 h-3" />
-                                <span>{customer.country}</span>
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              <span>{formatDate(customer.lastActive)}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 mb-2">
+                            <h3 className="font-semibold text-sm md:text-base truncate">{customer.name}</h3>
+                            <div className="flex flex-wrap gap-1">
+                              <Badge variant="outline" className={cn("text-xs", getKycBadge(customer.kycStatus))}>
+                                {customer.kycStatus}
+                              </Badge>
+                              {customer.saId && (
+                                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded hidden md:inline">
+                                  ID: {customer.saId}
+                                </span>
+                              )}
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            {customer.email && (
+                          {/* Mobile Compact Info */}
+                          <div className="space-y-1 md:space-y-2">
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
-                                <Mail className="w-3 h-3" />
-                                <span>{customer.email}</span>
+                                <Coins className="w-3 h-3 flex-shrink-0" />
+                                <span className="font-mono truncate max-w-[120px] md:max-w-none">
+                                  {truncateAddress(customer.walletAddress)}
+                                </span>
                               </div>
-                            )}
+                              
+                              {customer.country && (
+                                <div className="flex items-center gap-1 hidden md:flex">
+                                  <Globe className="w-3 h-3" />
+                                  <span>{customer.country}</span>
+                                </div>
+                              )}
+                              
+                              <div className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                <span>{formatDate(customer.lastActive)}</span>
+                              </div>
+                            </div>
                             
-                            {customer.vaspId && (
-                              <div className="flex items-center gap-1">
-                                <Shield className="w-3 h-3" />
-                                <span>VASP: {customer.vaspId}</span>
-                              </div>
-                            )}
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              {customer.email && (
+                                <div className="flex items-center gap-1 truncate max-w-[180px] md:max-w-none">
+                                  <Mail className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{customer.email}</span>
+                                </div>
+                              )}
+                              
+                              {customer.vaspId && (
+                                <div className="flex items-center gap-1 hidden md:flex">
+                                  <Shield className="w-3 h-3" />
+                                  <span>VASP: {customer.vaspId}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Stats & Actions */}
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Wallets</p>
-                          <p className="font-semibold text-foreground">{customer.totalTransactions}</p>
-                        </div>
-                        
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Balance</p>
-                          <p className="font-semibold text-foreground">{customer.totalVolume.toFixed(2)} ETH</p>
-                        </div>
-                        
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground mb-1">Risk Level</p>
-                          <Badge className={getRiskBadge(customer.riskLevel)}>
-                            {customer.riskLevel.toUpperCase()}
-                          </Badge>
+                      {/* Stats & Actions - Mobile Bottom Row */}
+                      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t border-border/30 md:border-0 pt-3 md:pt-0">
+                        <div className="flex items-center gap-4 md:gap-6">
+                          <div className="text-center md:text-right">
+                            <p className="text-xs text-muted-foreground">Wallets</p>
+                            <p className="font-semibold text-sm md:text-base">{customer.totalTransactions}</p>
+                          </div>
+                          
+                          <div className="text-center md:text-right hidden sm:block">
+                            <p className="text-xs text-muted-foreground">Balance</p>
+                            <p className="font-semibold text-sm md:text-base">{customer.totalVolume.toFixed(2)} ETH</p>
+                          </div>
+                          
+                          <div className="text-center md:text-right">
+                            <p className="text-xs text-muted-foreground mb-1 hidden md:block">Risk Level</p>
+                            <Badge className={cn("text-xs md:text-sm", getRiskBadge(customer.riskLevel))}>
+                              <span className="hidden md:inline">{customer.riskLevel.toUpperCase()}</span>
+                              <span className="md:hidden">{customer.riskLevel.charAt(0).toUpperCase()}</span>
+                            </Badge>
+                          </div>
                         </div>
                         
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 md:h-10 md:w-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleCustomerClick(customer.customerId || customer.id, customer.name);
                           }}
                         >
-                          <ExternalLink className="w-4 h-4" />
+                          <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                         </Button>
                       </div>
                     </div>
@@ -488,10 +504,10 @@ const Customers = () => {
               
               {/* Footer */}
               {customers.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground">
+                <div className="mt-6 pt-6 border-t border-border/50 flex flex-col md:flex-row md:items-center justify-between text-sm text-muted-foreground gap-2">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-success"></div>
-                    <span>
+                    <span className="text-xs md:text-sm">
                       {customers.length} customers from imported XML data
                     </span>
                   </div>
@@ -499,7 +515,7 @@ const Customers = () => {
                     variant="link" 
                     size="sm" 
                     onClick={fetchCustomers}
-                    className="text-primary"
+                    className="text-primary text-xs md:text-sm h-auto p-0"
                   >
                     Refresh Data
                   </Button>

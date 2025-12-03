@@ -4,9 +4,10 @@ import { KPICards } from "@/components/dashboard/KPICards";
 import { RiskDistributionChart } from "@/components/dashboard/RiskDistributionChart";
 import { LiveMarketPrices } from "@/components/dashboard/LiveMarketPrices";
 import { RecentAlertsTable } from "@/components/dashboard/RecentAlertsTable";
-import { RefreshCw, FileDown, User, AlertCircle } from "lucide-react";
+import { RefreshCw, FileDown, User, AlertCircle, Menu, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 // Your APIs
 const CUSTOMERS_API_ENDPOINT = 'https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev/customers';
@@ -56,6 +57,7 @@ const Dashboard = () => {
   const [lunoError, setLunoError] = useState<string | null>(null);
   const [customersError, setCustomersError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Fetch all dashboard data on mount
   useEffect(() => {
@@ -272,92 +274,114 @@ const Dashboard = () => {
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
-      <main className="flex-1 ml-0 md:ml-[280px] transition-all">
-        {/* Header Bar */}
-        <header className="sticky top-0 z-10 glass-card border-b border-border/50 backdrop-blur-md px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold">Crypto Risk Overview</h1>
-              <div className="text-xs text-muted-foreground">
-                Last updated: {lastUpdated.toLocaleTimeString('en-ZA', { 
-                  hour: '2-digit', 
-                  minute: '2-digit'
-                })}
+      <main className="flex-1 md:ml-[280px] transition-all pt-16 md:pt-0">
+        {/* Header Bar - Mobile Responsive */}
+        <header className="sticky top-0 z-10 glass-card border-b border-border/50 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center justify-between md:justify-start gap-3">
+              <div className="md:hidden flex items-center gap-2">
+                <h1 className="text-xl font-bold">Crypto Risk</h1>
+              </div>
+              <div className="hidden md:flex items-center gap-4">
+                <h1 className="text-2xl font-bold">Crypto Risk Overview</h1>
+                <div className="text-xs text-muted-foreground hidden md:block">
+                  Last updated: {lastUpdated.toLocaleTimeString('en-ZA', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                  })}
+                </div>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                {isRefreshing ? "Refreshing..." : "Refresh"}
-              </Button>
+            <div className="flex items-center justify-between md:justify-end gap-2">
+              <div className="text-xs text-muted-foreground md:hidden">
+                Updated: {getTimeAgo()}
+              </div>
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExport}
-                disabled={!dashboardStats || isLoading}
-                className="gap-2"
-              >
-                <FileDown className="h-4 w-4" />
-                Export
-              </Button>
-              
-              <Button variant="outline" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                Admin
-              </Button>
+              <div className="flex items-center gap-1 md:gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/reports')}
+                  className="h-9 w-9 md:h-10 md:w-auto md:gap-2"
+                  title="Reports"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden md:inline">Reports</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="h-9 w-9 md:h-10 md:w-auto md:gap-2"
+                  title="Refresh"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                  <span className="hidden md:inline">
+                    {isRefreshing ? "Refreshing..." : "Refresh"}
+                  </span>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleExport}
+                  disabled={!dashboardStats || isLoading}
+                  className="h-9 w-9 md:h-10 md:w-auto md:gap-2"
+                  title="Export"
+                >
+                  <FileDown className="h-4 w-4" />
+                  <span className="hidden md:inline">Export</span>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-9 w-9 md:h-10 md:w-auto md:gap-2 hidden md:flex"
+                  title="Admin"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="hidden md:inline">Admin</span>
+                </Button>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-3 md:p-6 space-y-4 md:space-y-6">
           
-          {/* Error Banner */}
+          {/* Error Banner - Mobile Responsive */}
           {hasError && (
-            <div className="flex flex-col gap-2 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                <span className="text-sm font-medium text-destructive">API Connection Issues</span>
-              </div>
-              <div className="text-xs text-destructive/80 space-y-1">
-                {customersError && <div>• Customers API: {customersError}</div>}
-                {lunoError && <div>• Luno API: {lunoError}</div>}
-              </div>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRefresh}
-                  className="text-xs h-8"
-                >
-                  Retry
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setCustomersError(null);
-                    setLunoError(null);
-                  }}
-                  className="text-xs h-8"
-                >
-                  Dismiss
-                </Button>
+            <div className="flex flex-col gap-2 p-3 md:p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-destructive flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-destructive">API Connection Issues</div>
+                  <div className="text-xs text-destructive/80 mt-1 space-y-0.5">
+                    {customersError && <div>• Customers API: {customersError}</div>}
+                    {lunoError && <div>• Luno API: {lunoError}</div>}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRefresh}
+                      className="text-xs h-7"
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Loading State */}
           {isLoading && !dashboardStats ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-8 md:py-12">
               <div className="text-center space-y-3">
                 <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-muted-foreground">Loading dashboard data...</p>
@@ -377,7 +401,7 @@ const Dashboard = () => {
             <>
               <KPICards stats={dashboardStats} loading={isLoading} />
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-6">
                 <RiskDistributionChart 
                   riskDistribution={dashboardStats?.riskDistribution} 
                   totalCustomers={dashboardStats?.totalCustomers}
