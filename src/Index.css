@@ -172,11 +172,34 @@ All colors MUST be HSL.
     min-width: 44px !important;
   }
 
+  /* Exception: Don't force size on switch components */
+  [role="switch"] {
+    min-height: auto !important;
+    min-width: auto !important;
+  }
+
+  /* Fix switch overflow and animation */
+  [role="switch"] {
+    overflow: visible !important;
+  }
+
+  [role="switch"] span {
+    pointer-events: none !important;
+  }
+
+  /* Allow switch to render outside parent bounds */
+  [role="switch"],
+  [role="switch"] * {
+    position: relative;
+    z-index: 10;
+  }
+
   /* Prevent horizontal scroll */
   html, body {
     overflow-x: hidden !important;
     max-width: 100vw !important;
     position: relative;
+    overflow-y: auto !important;
   }
 
   /* Better font rendering on mobile */

@@ -2,13 +2,14 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Calendar, Filter, Search, AlertTriangle, Building, Shield, Loader2, Eye, ChevronRight, Menu, X, Upload, FileUp } from "lucide-react";
+import { FileText, Download, Calendar, Filter, Search, AlertTriangle, Building, Shield, Loader2, Eye, ChevronRight, Menu, X, Upload, FileUp, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { jsPDF } from "jspdf";
 import { GenerateReportDialog } from "@/components/reports/GenerateReportDialog";
+import { useNavigate } from "react-router-dom";
 
 // SA Regulatory Report Types
 const SA_REPORT_TYPES = {
@@ -109,6 +110,7 @@ const Reports = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reports, setReports] = useState(mockReports);
+  const navigate = useNavigate();
 
   const getTimeAgo = () => {
     const seconds = Math.floor((new Date().getTime() - lastUpdated.getTime()) / 1000);
@@ -337,462 +339,443 @@ const Reports = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <DashboardSidebar lastUpdated={getTimeAgo()} />
+      <div className="hidden md:block">
+        <DashboardSidebar lastUpdated={getTimeAgo()} />
+      </div>
       
-      {/* Main Content Area - Fixed for mobile centering */}
-      <main className="flex-1 md:ml-[280px] transition-all w-full">
-        {/* Mobile Header with Menu Button */}
-        <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-center justify-between w-full md:w-auto">
-              <div className="flex items-center gap-3">
-                <div className="md:hidden">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className="h-9 w-9"
-                  >
-                    {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                  </Button>
-                </div>
-                <div className="md:hidden flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-primary" />
-                  </div>
-                  <h1 className="text-xl font-bold">Reports</h1>
-                </div>
-                <div className="hidden md:flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold">Compliance Reports</h1>
-                    <p className="text-sm text-muted-foreground hidden md:block">
-                      South African Regulatory Reporting
-                    </p>
-                  </div>
-                </div>
-              </div>
+      <main className="flex-1 w-full md:ml-[280px] transition-all">
+        {/* Single Header with Back Button */}
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-3 md:px-6 md:py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Mobile Back Button */}
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="h-9 w-9 md:hidden"
+                onClick={() => navigate(-1)}
+                title="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
               
-              <div className="md:hidden">
-                <Button 
-                  onClick={handleGenerateReport} 
-                  className="gap-2 text-sm h-9"
-                  size="sm"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>New</span>
-                </Button>
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="h-9 w-9 md:hidden"
+              >
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+
+              {/* Desktop Icon and Title */}
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                <h1 className="text-base md:text-2xl font-bold">Reports</h1>
               </div>
             </div>
-            
-            <div className="hidden md:flex items-center gap-2">
+
+            {/* Save Button - Right */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Button 
                 onClick={handleGenerateReport} 
-                className="gap-2 text-sm md:text-base h-9 md:h-10"
-                size="sm"
+                size="sm" 
+                className="h-9 md:h-10"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-4 h-4 mr-2" />
                 <span>New Report</span>
               </Button>
             </div>
           </div>
         </header>
 
-        {/* Content Container - Properly centered on mobile */}
-        <div className="w-full max-w-full overflow-x-hidden">
-          {/* SA Compliance Stats - Mobile Stacked */}
-          <div className="px-4 md:px-6 pt-4 md:pt-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <Card className="glass-card border-border/50">
-                <CardContent className="p-3 md:p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs md:text-sm text-muted-foreground">Total Reports</p>
-                      <p className="text-xl md:text-2xl font-bold">{stats.totalReports}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{stats.saReports} SA specific</p>
-                    </div>
-                    <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="glass-card border-border/50">
-                <CardContent className="p-3 md:p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs md:text-sm text-muted-foreground">Customers Analyzed</p>
-                      <p className="text-xl md:text-2xl font-bold">{stats.totalCustomers}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{stats.highRiskCustomers} high risk</p>
-                    </div>
-                    <Building className="w-6 h-6 md:w-8 md:h-8 text-warning" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="glass-card border-border/50">
-                <CardContent className="p-3 md:p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs md:text-sm text-muted-foreground">SAR Ready</p>
-                      <p className="text-xl md:text-2xl font-bold">{stats.urgentReports}</p>
-                      <p className="text-xs text-muted-foreground mt-1">For FIC submission</p>
-                    </div>
-                    <AlertTriangle className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="glass-card border-border/50">
-                <CardContent className="p-3 md:p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs md:text-sm text-muted-foreground">Regulatory Frameworks</p>
-                      <p className="text-xl md:text-2xl font-bold">4</p>
-                      <p className="text-xs text-muted-foreground mt-1">FIC, RICA, FATF, POPIA</p>
-                    </div>
-                    <Shield className="w-6 h-6 md:w-8 md:h-8 text-success" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="p-4 md:p-6">
-            {/* Filters Card */}
-            <Card className="glass-card border-border/50 mb-4 md:mb-6">
-              <CardHeader className="border-b border-border/50 p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
+          {/* SA Compliance Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg md:text-xl">Report Filters</CardTitle>
-                    <CardDescription className="text-xs md:text-sm">
-                      Filter compliance reports by type, status, and jurisdiction
-                    </CardDescription>
+                    <p className="text-xs md:text-sm text-muted-foreground">Total Reports</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.totalReports}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stats.saReports} SA specific</p>
                   </div>
-                  <Badge variant="outline" className="text-xs md:text-sm border-border w-fit">
-                    {filteredReports.length} of {reports.length}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search reports by title or type..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-muted/50 text-sm md:text-base"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-                    <div>
-                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Report Type</label>
-                      <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
-                        <SelectTrigger className="text-sm md:text-base w-full">
-                          <Filter className="w-4 h-4 mr-2 hidden sm:block" />
-                          <SelectValue placeholder="All Types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="FICA Compliance">FICA Compliance</SelectItem>
-                          <SelectItem value="Suspicious Activity Report">SAR</SelectItem>
-                          <SelectItem value="RICA Monitoring">RICA Monitoring</SelectItem>
-                          <SelectItem value="FATF Travel Rule">FATF Travel Rule</SelectItem>
-                          <SelectItem value="Risk Assessment">Risk Assessment</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Status</label>
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="text-sm md:text-base w-full">
-                          <SelectValue placeholder="All Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="processing">Processing</SelectItem>
-                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs md:text-sm text-muted-foreground mb-1 block">Jurisdiction</label>
-                      <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
-                        <SelectTrigger className="text-sm md:text-base w-full">
-                          <SelectValue placeholder="All Jurisdictions" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Jurisdictions</SelectItem>
-                          <SelectItem value="SA">South Africa</SelectItem>
-                          <SelectItem value="International">International</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setReportTypeFilter("all");
-                        setStatusFilter("all");
-                        setJurisdictionFilter("all");
-                        setSearchQuery("");
-                      }}
-                      className="text-xs md:text-sm h-8"
-                    >
-                      Clear Filters
-                    </Button>
-                  </div>
+                  <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
-
-            {/* Reports List */}
-            <Card className="glass-card border-border/50">
-              <CardHeader className="border-b border-border/50 p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            
+            <Card>
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg md:text-xl">Compliance Reports</CardTitle>
-                    <CardDescription className="text-xs md:text-sm">
-                      View, download, and submit regulatory reports
-                    </CardDescription>
+                    <p className="text-xs md:text-sm text-muted-foreground">Customers Analyzed</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.totalCustomers}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stats.highRiskCustomers} high risk</p>
                   </div>
-                  <div className="text-xs md:text-sm text-muted-foreground">
-                    Updated: {getTimeAgo()}
+                  <Building className="w-6 h-6 md:w-8 md:h-8 text-warning" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs md:text-sm text-muted-foreground">SAR Ready</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.urgentReports}</p>
+                    <p className="text-xs text-muted-foreground mt-1">For FIC submission</p>
+                  </div>
+                  <AlertTriangle className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs md:text-sm text-muted-foreground">Regulatory Frameworks</p>
+                    <p className="text-xl md:text-2xl font-bold">4</p>
+                    <p className="text-xs text-muted-foreground mt-1">FIC, RICA, FATF, POPIA</p>
+                  </div>
+                  <Shield className="w-6 h-6 md:w-8 md:h-8 text-success" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-lg md:text-xl">Report Filters</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Filter compliance reports by type, status, and jurisdiction
+                  </CardDescription>
+                </div>
+                <Badge variant="outline" className="text-xs md:text-sm w-fit">
+                  {filteredReports.length} of {reports.length}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search reports by title or type..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 text-sm md:text-base"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs md:text-sm text-muted-foreground block">Report Type</label>
+                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+                      <SelectTrigger className="text-sm md:text-base w-full">
+                        <Filter className="w-4 h-4 mr-2 hidden sm:block" />
+                        <SelectValue placeholder="All Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="FICA Compliance">FICA Compliance</SelectItem>
+                        <SelectItem value="Suspicious Activity Report">SAR</SelectItem>
+                        <SelectItem value="RICA Monitoring">RICA Monitoring</SelectItem>
+                        <SelectItem value="FATF Travel Rule">FATF Travel Rule</SelectItem>
+                        <SelectItem value="Risk Assessment">Risk Assessment</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs md:text-sm text-muted-foreground block">Status</label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="text-sm md:text-base w-full">
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs md:text-sm text-muted-foreground block">Jurisdiction</label>
+                    <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
+                      <SelectTrigger className="text-sm md:text-base w-full">
+                        <SelectValue placeholder="All Jurisdictions" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Jurisdictions</SelectItem>
+                        <SelectItem value="SA">South Africa</SelectItem>
+                        <SelectItem value="International">International</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </CardHeader>
-              
-              <CardContent className="p-4 md:p-6">
-                {filteredReports.length === 0 ? (
-                  <div className="text-center py-8 md:py-12">
-                    <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground/30 mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No reports found</h3>
-                    <p className="text-muted-foreground text-sm md:text-base">Try adjusting your filters or search query</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 md:space-y-4">
-                    {filteredReports.map((report) => {
-                      const statusBadge = getStatusBadge(report.status);
-                      const isGenerating = generatingReportId === report.id;
-                      
-                      return (
-                        <div
-                          key={report.id}
-                          className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 hover-lift transition-all cursor-pointer"
-                        >
-                          {/* Report Info - Mobile Stacked */}
-                          <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-0 flex-1">
-                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center border-2 border-background flex-shrink-0 ${
-                              report.type === "Suspicious Activity Report" ? "bg-destructive/20" :
-                              report.type === "FICA Compliance" ? "bg-primary/20" :
-                              "bg-warning/20"
-                            }`}>
-                              {report.type === "Suspicious Activity Report" ? (
-                                <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-destructive" />
-                              ) : report.type === "FICA Compliance" ? (
-                                <Shield className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                              ) : (
-                                <FileText className="w-5 h-5 md:w-6 md:h-6 text-warning" />
-                              )}
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 mb-1 md:mb-2">
-                                <h3 className="font-semibold text-sm md:text-base truncate">
-                                  {report.title}
-                                </h3>
-                                <div className="flex flex-wrap gap-1">
-                                  {report.urgent && (
-                                    <Badge variant="destructive" className="text-xs px-1.5 py-0.5">URGENT</Badge>
-                                  )}
-                                  {report.confidential && (
-                                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-destructive/50 text-destructive">
-                                      CONFIDENTIAL
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {/* Mobile Info - Compact */}
-                              <div className="space-y-1 md:space-y-2">
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <FileText className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate max-w-[100px] md:max-w-none">{report.type}</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
-                                    <span>{report.date}</span>
-                                  </div>
-                                  
-                                  <Badge className={`text-xs px-1.5 py-0 ${statusBadge.class}`}>
-                                    {report.status.toUpperCase()}
-                                  </Badge>
-                                </div>
-                                
-                                <div className="text-xs text-muted-foreground line-clamp-2 md:line-clamp-1">
-                                  {report.description}
-                                </div>
-                                
-                                {/* Mobile Details */}
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground md:hidden">
-                                  <span>• {report.size}</span>
-                                  <span>• {report.jurisdiction}</span>
-                                  {typeof report.customerCount === 'number' && (
-                                    <span>• {report.customerCount} customers</span>
-                                  )}
-                                  {typeof report.highRisk === 'number' && (
-                                    <span className="text-destructive">• {report.highRisk} high risk</span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setReportTypeFilter("all");
+                      setStatusFilter("all");
+                      setJurisdictionFilter("all");
+                      setSearchQuery("");
+                    }}
+                    className="text-xs md:text-sm h-8"
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reports List */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-lg md:text-xl">Compliance Reports</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    View, download, and submit regulatory reports
+                  </CardDescription>
+                </div>
+                <div className="text-xs md:text-sm text-muted-foreground">
+                  Updated: {getTimeAgo()}
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              {filteredReports.length === 0 ? (
+                <div className="text-center py-8 md:py-12">
+                  <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No reports found</h3>
+                  <p className="text-muted-foreground text-sm md:text-base">Try adjusting your filters or search query</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredReports.map((report) => {
+                    const statusBadge = getStatusBadge(report.status);
+                    const isGenerating = generatingReportId === report.id;
+                    
+                    return (
+                      <div
+                        key={report.id}
+                        className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border hover:border-primary/50 transition-all cursor-pointer"
+                      >
+                        {/* Report Info */}
+                        <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-0 flex-1">
+                          <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center border-2 border-background flex-shrink-0 ${
+                            report.type === "Suspicious Activity Report" ? "bg-destructive/20" :
+                            report.type === "FICA Compliance" ? "bg-primary/20" :
+                            "bg-warning/20"
+                          }`}>
+                            {report.type === "Suspicious Activity Report" ? (
+                              <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-destructive" />
+                            ) : report.type === "FICA Compliance" ? (
+                              <Shield className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                            ) : (
+                              <FileText className="w-5 h-5 md:w-6 md:h-6 text-warning" />
+                            )}
                           </div>
                           
-                          {/* Actions & Details - Mobile Bottom Row */}
-                          <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4 border-t border-border/30 md:border-0 pt-3 md:pt-0">
-                            {/* Desktop Details */}
-                            <div className="hidden md:flex flex-col items-end text-sm text-muted-foreground">
-                              <span>{report.size}</span>
-                              <span>{report.jurisdiction}</span>
-                              {typeof report.customerCount === 'number' && (
-                                <span>{report.customerCount} customers</span>
-                              )}
-                              {typeof report.highRisk === 'number' && (
-                                <span className="text-destructive">{report.highRisk} high risk</span>
-                              )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                              <h3 className="font-semibold text-sm md:text-base truncate">
+                                {report.title}
+                              </h3>
+                              <div className="flex flex-wrap gap-1">
+                                {report.urgent && (
+                                  <Badge variant="destructive" className="text-xs px-1.5 py-0.5">URGENT</Badge>
+                                )}
+                                {report.confidential && (
+                                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-destructive/50 text-destructive">
+                                    CONFIDENTIAL
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                             
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handlePreview(report)}
-                                disabled={report.status !== "completed"}
-                                className="h-8 w-8 md:h-9 md:w-auto md:px-3"
-                                title={report.status !== "completed" ? "Report still processing" : "Preview report"}
-                              >
-                                <Eye className="w-4 h-4" />
-                                <span className="hidden md:inline ml-1">Preview</span>
-                              </Button>
+                            <div className="space-y-1 md:space-y-2">
+                              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <FileText className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{report.type}</span>
+                                </div>
+                                
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  <span>{report.date}</span>
+                                </div>
+                                
+                                <Badge className={`text-xs px-1.5 py-0 ${statusBadge.class}`}>
+                                  {report.status.toUpperCase()}
+                                </Badge>
+                              </div>
                               
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDownload(report)}
-                                disabled={report.status !== "completed" || isGenerating}
-                                className="h-8 w-8 md:h-9 md:w-auto md:px-3"
-                                title={report.status !== "completed" ? "Report still processing" : "Download PDF"}
-                              >
-                                {isGenerating ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Download className="w-4 h-4" />
+                              <div className="text-xs text-muted-foreground line-clamp-2">
+                                {report.description}
+                              </div>
+                              
+                              {/* Mobile Details */}
+                              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground md:hidden">
+                                <span>• {report.size}</span>
+                                <span>• {report.jurisdiction}</span>
+                                {typeof report.customerCount === 'number' && (
+                                  <span>• {report.customerCount} customers</span>
                                 )}
-                                <span className="hidden md:inline ml-1">PDF</span>
-                              </Button>
-                              
-                              {report.type === "Suspicious Activity Report" && report.status === "completed" && (
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleSubmitToFIC(report)}
-                                  className="h-8 w-8 md:h-9 md:w-auto md:px-3"
-                                  title="Submit to Financial Intelligence Centre"
-                                >
-                                  <FileUp className="w-4 h-4" />
-                                  <span className="hidden md:inline ml-1">FIC</span>
-                                </Button>
-                              )}
+                                {typeof report.highRisk === 'number' && (
+                                  <span className="text-destructive">• {report.highRisk} high risk</span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-                
-                {/* Footer */}
-                <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-border/50 flex flex-col md:flex-row md:items-center justify-between text-sm text-muted-foreground gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-success"></div>
-                    <span className="text-xs md:text-sm">
-                      South African Regulatory Compliance System
-                    </span>
-                  </div>
+                        
+                        {/* Actions & Details */}
+                        <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4 border-t border-border/30 md:border-0 pt-3 md:pt-0">
+                          {/* Desktop Details */}
+                          <div className="hidden md:flex flex-col items-end text-sm text-muted-foreground">
+                            <span>{report.size}</span>
+                            <span>{report.jurisdiction}</span>
+                            {typeof report.customerCount === 'number' && (
+                              <span>{report.customerCount} customers</span>
+                            )}
+                            {typeof report.highRisk === 'number' && (
+                              <span className="text-destructive">{report.highRisk} high risk</span>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handlePreview(report)}
+                              disabled={report.status !== "completed"}
+                              className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                              title={report.status !== "completed" ? "Report still processing" : "Preview report"}
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden md:inline ml-1">Preview</span>
+                            </Button>
+                            
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDownload(report)}
+                              disabled={report.status !== "completed" || isGenerating}
+                              className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                              title={report.status !== "completed" ? "Report still processing" : "Download PDF"}
+                            >
+                              {isGenerating ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Download className="w-4 h-4" />
+                              )}
+                              <span className="hidden md:inline ml-1">PDF</span>
+                            </Button>
+                            
+                            {report.type === "Suspicious Activity Report" && report.status === "completed" && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleSubmitToFIC(report)}
+                                className="h-8 w-8 md:h-9 md:w-auto md:px-3"
+                                title="Submit to Financial Intelligence Centre"
+                              >
+                                <FileUp className="w-4 h-4" />
+                                <span className="hidden md:inline ml-1">FIC</span>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              
+              {/* Footer */}
+              <div className="mt-6 pt-6 border-t flex flex-col md:flex-row md:items-center justify-between text-sm text-muted-foreground gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-success"></div>
                   <span className="text-xs md:text-sm">
-                    {filteredReports.length} reports displayed
+                    South African Regulatory Compliance System
                   </span>
                 </div>
-              </CardContent>
-            </Card>
+                <span className="text-xs md:text-sm">
+                  {filteredReports.length} reports displayed
+                </span>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Regulatory Information */}
-            <Card className="glass-card border-border/50 mt-4 md:mt-6">
-              <CardHeader className="border-b border-border/50 p-4 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                  <div>
-                    <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-primary" />
-                      South African Regulatory Framework
-                    </CardTitle>
-                    <CardDescription className="text-xs md:text-sm">
-                      Reports are generated in compliance with SA regulations
-                    </CardDescription>
-                  </div>
+          {/* Regulatory Information */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-primary" />
+                    South African Regulatory Framework
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Reports are generated in compliance with SA regulations
+                  </CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent className="p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm md:text-base">Mandatory Reports</h4>
-                    <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
-                      <li className="flex items-start gap-2">
-                        <div className="w-2 h-2 rounded-full bg-destructive mt-1.5 flex-shrink-0"></div>
-                        <span><strong>Suspicious Activity Reports (SAR):</strong> Required within 7 days of detection (FIC Act Section 29)</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
-                        <span><strong>FICA Compliance Reports:</strong> Annual compliance reporting requirements</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-2 h-2 rounded-full bg-warning mt-1.5 flex-shrink-0"></div>
-                        <span><strong>RICA Transaction Reports:</strong> Communication monitoring as per RICA Act</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm md:text-base">Report Retention</h4>
-                    <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <span><strong>SAR Reports:</strong> 5 years minimum retention</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <span><strong>FICA Records:</strong> 5 years from termination of business relationship</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <span><strong>Transaction Records:</strong> 5 years as per FIC Act</span>
-                      </li>
-                    </ul>
-                  </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm md:text-base">Mandatory Reports</h4>
+                  <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <div className="w-2 h-2 rounded-full bg-destructive mt-1.5 flex-shrink-0"></div>
+                      <span><strong>Suspicious Activity Reports (SAR):</strong> Required within 7 days of detection (FIC Act Section 29)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                      <span><strong>FICA Compliance Reports:</strong> Annual compliance reporting requirements</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-2 h-2 rounded-full bg-warning mt-1.5 flex-shrink-0"></div>
+                      <span><strong>RICA Transaction Reports:</strong> Communication monitoring as per RICA Act</span>
+                    </li>
+                  </ul>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm md:text-base">Report Retention</h4>
+                  <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span><strong>SAR Reports:</strong> 5 years minimum retention</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span><strong>FICA Records:</strong> 5 years from termination of business relationship</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span><strong>Transaction Records:</strong> 5 years as per FIC Act</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
