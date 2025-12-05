@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, Mail, Printer, Eye, AlertTriangle, ShieldAlert, Building, FileWarning, Clock } from "lucide-react";
+import { ArrowLeft, Download, Mail, Printer, Eye, AlertTriangle, ShieldAlert, Building, FileWarning, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -47,29 +47,36 @@ const Results = () => {
   const [walletAnalysis, setWalletAnalysis] = useState<WalletAnalysis | null>(null);
   const [liveMarketData, setLiveMarketData] = useState<any[]>([]);
   const [exporting, setExporting] = useState(false);
+  const [marketDataLoading, setMarketDataLoading] = useState(false);
 
   // Get results from navigation state
   const apiData = location.state?.results;
 
   // Fetch live market data
-  useEffect(() => {
-    const fetchLiveMarketData = async () => {
-      try {
-        const response = await fetch('https://6duobrslvyityfkazhdl2e4cpu0qqacs.lambda-url.us-east-1.on.aws/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setLiveMarketData(data.market_prices || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch live market data:', error);
+  const fetchLiveMarketData = async () => {
+    try {
+      setMarketDataLoading(true);
+      const response = await fetch('https://6duobrslvyityfkazhdl2e4cpu0qqacs.lambda-url.us-east-1.on.aws/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setLiveMarketData(data.market_prices || []);
+        toast.success("Market data refreshed");
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch live market data:', error);
+      toast.error("Failed to refresh market data");
+    } finally {
+      setMarketDataLoading(false);
+    }
+  };
 
+  // Initial fetch of market data
+  useEffect(() => {
     if (apiData) {
       fetchLiveMarketData();
     }
@@ -217,8 +224,6 @@ const Results = () => {
         })),
         last_updated: apiData.enriched_at || new Date().toISOString(),
         luno_integration: apiData.luno_integration,
-        // REAL MARKET DATA FROM LUNO API
-        market_tickers: liveMarketData,
         // SA COMPLIANCE DATA
         sa_compliance: saComplianceData,
         wallet_analysis: walletAnalysis
@@ -233,6 +238,7 @@ const Results = () => {
         customer: transformedData,
         sa_compliance: saComplianceData,
         wallet_analysis: walletAnalysis,
+        market_data: liveMarketData,
         generated_at: new Date().toISOString(),
         jurisdiction: "South Africa",
         regulatory_framework: "FIC Act No. 38 of 2001"
@@ -591,11 +597,13 @@ const Results = () => {
           <RiskFlags flags={transformedData.risk_flags} />
         </section>
 
-        {/* Customer-Specific Market Data */}
+        {/* Customer-Specific Market Data - UPDATED */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
           <MarketData 
-            marketTickers={transformedData.market_tickers} 
+            marketPrices={liveMarketData}  // Changed from marketTickers to marketPrices
             customerId={transformedData.customer_id}
+            isLoading={marketDataLoading}  // Added loading state
+            onRefresh={fetchLiveMarketData}  // Added refresh function
           />
         </section>
 
