@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext"; // Add this import
 
 interface DashboardSidebarProps {
   lastUpdated: string;
@@ -24,6 +25,7 @@ const menuItems = [
 export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth(); // Get logout function from auth context
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleNavigate = (path: string) => {
@@ -34,8 +36,14 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
     }
   };
 
-  const handleLogout = () => {
-    console.log("Logging out...");
+  const handleLogout = async () => {
+    try {
+      await logout(); // Call the logout function from your AuthContext
+      navigate("/auth"); // Redirect to login page after logout
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // You can add toast notification here if needed
+    }
   };
 
   // If mobile prop is true, don't show the mobile header/overlay

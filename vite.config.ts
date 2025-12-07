@@ -15,4 +15,21 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    global: "globalThis", // Fix for amazon-cognito-identity-js
+  },
+  optimizeDeps: {
+    include: ["amazon-cognito-identity-js"],
+    esbuildOptions: {
+      define: {
+        global: "globalThis", // Also needed here
+      },
+    },
+  },
+  build: {
+    target: "es2020",
+    rollupOptions: {
+      external: [], // Ensure nothing is externalized
+    },
+  },
 }));

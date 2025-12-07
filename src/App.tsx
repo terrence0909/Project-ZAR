@@ -1,49 +1,118 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Results from "./pages/Results";
-import DataImport from "./pages/DataImport";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
-import CustomerDetail from "./pages/CustomerDetail";
-import Alerts from "./pages/Alerts";
-import Market from "./pages/Market";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
-import RolesPermissions from "./pages/RolesPermissions";
+import Results from "./pages/Results";
+import CustomerDetail from "./pages/CustomerDetail";
+import Market from "./pages/Market";
 import AuditLog from "./pages/AuditLog";
-import NotFound from "./pages/NotFound";
+import RolesPermissions from "./pages/RolesPermissions";
+import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import Alerts from "./pages/Alerts";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Toaster richColors position="top-right" />
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/data-import" element={<DataImport />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/customers/:id" element={<CustomerDetail />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/market" element={<Market />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/roles-permissions" element={<RolesPermissions />} />
-          <Route path="/audit-log" element={<AuditLog />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          {/* Public routes */}
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute>
+                <Customers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customers/:id"
+            element={
+              <ProtectedRoute>
+                <CustomerDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results"
+            element={
+              <ProtectedRoute>
+                <Results />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/market"
+            element={
+              <ProtectedRoute>
+                <Market />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/audit-log"
+            element={
+              <ProtectedRoute>
+                <AuditLog />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roles-permissions"
+            element={
+              <ProtectedRoute>
+                <RolesPermissions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/alerts"
+            element={
+              <ProtectedRoute>
+                <Alerts />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </AuthProvider>
+    </Router>
+  );
+}
 
 export default App;
