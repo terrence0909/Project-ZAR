@@ -18,7 +18,7 @@ import DataImport from "./pages/DataImport";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/Project-ZAR/">
       <AuthProvider>
         <Toaster richColors position="top-right" />
         <Routes>
@@ -26,98 +26,22 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           
-          {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/customers"
-            element={
-              <ProtectedRoute>
-                <Customers />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/customers/:id"
-            element={
-              <ProtectedRoute>
-                <CustomerDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/results"
-            element={
-              <ProtectedRoute>
-                <Results />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/market"
-            element={
-              <ProtectedRoute>
-                <Market />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/audit-log"
-            element={
-              <ProtectedRoute>
-                <AuditLog />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/roles-permissions"
-            element={
-              <ProtectedRoute>
-                <RolesPermissions />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/alerts"
-            element={
-              <ProtectedRoute>
-                <Alerts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/data-import"
-            element={
-              <ProtectedRoute>
-                <DataImport />
-              </ProtectedRoute>
-            }
-          />
+          {/* Protected routes - FIXED PATTERN */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
+          <Route path="/customer/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
+          <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+          <Route path="/audit-log" element={<ProtectedRoute><AuditLog /></ProtectedRoute>} />
+          <Route path="/roles" element={<ProtectedRoute><RolesPermissions /></ProtectedRoute>} />
+          <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+          <Route path="/import" element={<ProtectedRoute><DataImport /></ProtectedRoute>} />
           
-          {/* Default redirect */}
+          {/* GitHub Pages fallback routes */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
