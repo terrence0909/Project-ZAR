@@ -4,9 +4,8 @@ on:
   push:
     branches: [ main ]
 
-# 👇 ADD THIS PERMISSIONS SECTION
 permissions:
-  contents: write  # Allows pushing to gh-pages branch
+  contents: write
   pages: write
   id-token: write
 
@@ -28,7 +27,11 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}  # Ensure this is set
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+      # 👇 CRITICAL: Create .nojekyll file to disable Jekyll processing
+      - name: Create .nojekyll file
+        run: touch ./dist/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
