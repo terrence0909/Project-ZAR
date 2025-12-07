@@ -78,7 +78,7 @@ const DataImport = () => {
 
       // Send as JSON (not FormData)
       const response = await fetch(
-        "https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev/upload-xml",
+        `${import.meta.env.VITE_API_BASE_URL}/upload-xml`,
         {
           method: "POST",
           headers: {

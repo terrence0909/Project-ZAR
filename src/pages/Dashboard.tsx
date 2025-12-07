@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // Your APIs
-const CUSTOMERS_API_ENDPOINT = 'https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev/customers';
+const CUSTOMERS_API_ENDPOINT = `${import.meta.env.VITE_API_BASE_URL}/customers`;
 const LUNO_API_ENDPOINT = 'https://6duobrslvyityfkazhdl2e4cpu0qqacs.lambda-url.us-east-1.on.aws/';
 
 interface DashboardStats {

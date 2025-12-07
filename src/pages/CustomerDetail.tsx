@@ -30,7 +30,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
 // API Endpoint
-const CUSTOMERS_API_ENDPOINT = 'https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev/customers';
+const CUSTOMERS_API_ENDPOINT = `${import.meta.env.VITE_API_BASE_URL}/customers`;
 
 interface Customer {
   id?: string;

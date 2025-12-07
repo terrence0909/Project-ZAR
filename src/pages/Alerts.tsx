@@ -50,7 +50,7 @@ const Alerts = () => {
       
       console.log("📡 Fetching customer data for alerts...");
       
-      const response = await fetch('https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev/customers', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

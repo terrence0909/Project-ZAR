@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-const API_URL = "https://4yhpt4dlwe.execute-api.us-east-1.amazonaws.com/dev";
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Index = () => {
   const navigate = useNavigate();
