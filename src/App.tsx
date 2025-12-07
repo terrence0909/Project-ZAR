@@ -14,6 +14,7 @@ import RolesPermissions from "./pages/RolesPermissions";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import Alerts from "./pages/Alerts";
+import DataImport from "./pages/DataImport";
 
 function App() {
   return (
@@ -103,6 +104,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Alerts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/data-import"
+            element={
+              <ProtectedRoute>
+                <DataImport />
               </ProtectedRoute>
             }
           />

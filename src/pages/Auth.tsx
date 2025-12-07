@@ -1,4 +1,4 @@
-// src/pages/Auth.tsx - Simplified working version
+// src/pages/Auth.tsx - Fixed tabs layout
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Mail, Lock, Loader2, ArrowLeft, Building2 } from 'lucide-react';
@@ -28,7 +28,6 @@ const Auth = () => {
     
     try {
       await signIn(email, password);
-      // If signIn succeeds, it will navigate automatically in AuthContext
     } catch (error) {
       // Error is already handled in AuthContext
     } finally {
@@ -41,10 +40,9 @@ const Auth = () => {
     setIsLoading(true);
     
     try {
-      // For demo purposes, just sign in with the created account
-      // In a real app, you would call a signUp API here
       if (password !== confirmPassword) {
         toast.error('Passwords do not match');
+        setIsLoading(false);
         return;
       }
       
@@ -62,46 +60,69 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+      <div className="w-full max-w-md mx-auto">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="flex flex-col items-center justify-center gap-3 mb-8 text-center">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/20 flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
           </div>
-          <div className="text-left">
+          <div>
             <h1 className="text-2xl font-bold tracking-tight">PROJECT ZAR</h1>
-            <p className="text-sm text-muted-foreground">Compliance Platform</p>
+            <p className="text-sm text-muted-foreground mt-1">Compliance Dashboard</p>
           </div>
         </div>
 
         {/* Auth Card */}
-        <Card className="glass-card border-border/50">
+        <Card className="border-border/50 shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
+            <CardTitle className="flex items-center justify-center gap-2 text-xl">
               <Shield className="w-5 h-5 text-primary" />
               {activeTab === 'login' ? 'Secure Login' : 'Create Account'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               {activeTab === 'login' 
-                ? 'Enter your credentials to access the compliance dashboard'
+                ? 'Enter your credentials to access the dashboard'
                 : 'Create a new account to get started'}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
+          <CardContent className="space-y-6">
+            {/* Tabs - Fixed layout */}
+            <div className="bg-muted/30 p-1 rounded-lg">
+              <div className="grid grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('login')}
+                  className={`py-3 text-center rounded-md transition-all ${
+                    activeTab === 'login'
+                      ? 'bg-background text-foreground shadow-sm font-medium'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('signup')}
+                  className={`py-3 text-center rounded-md transition-all ${
+                    activeTab === 'signup'
+                      ? 'bg-background text-foreground shadow-sm font-medium'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Sign Up
+                </button>
+              </div>
+            </div>
 
-              {/* Login Form */}
-              <TabsContent value="login">
+            {/* Login Form */}
+            {activeTab === 'login' && (
+              <div className="space-y-6">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="login-email"
                         type="email"
@@ -109,7 +130,7 @@ const Auth = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="pl-10 bg-background/50"
+                        className="pl-10"
                       />
                     </div>
                   </div>
@@ -117,7 +138,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="login-password"
                         type="password"
@@ -125,16 +146,12 @@ const Auth = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="pl-10 bg-background/50"
+                        className="pl-10"
                       />
                     </div>
                   </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -147,126 +164,116 @@ const Auth = () => {
                 </form>
 
                 {/* Demo credentials */}
-                <div className="mt-6 p-4 rounded-lg bg-muted/30 text-sm">
-                  <p className="font-medium mb-2">Demo Credentials:</p>
-                  <div className="space-y-1">
-                    <p>Admin: <span className="text-muted-foreground">admin@projectzar.com</span></p>
-                    <p>Compliance: <span className="text-muted-foreground">compliance@projectzar.com</span></p>
-                    <p>Viewer: <span className="text-muted-foreground">viewer@projectzar.com</span></p>
-                    <p>Password for all: <span className="text-muted-foreground">password123</span></p>
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <p className="font-medium text-sm mb-2">Demo Credentials:</p>
+                  <div className="space-y-1 text-sm">
+                    <p className="break-all">Admin: <span className="text-muted-foreground">admin@projectzar.com</span></p>
+                    <p>Password: <span className="text-muted-foreground">password123</span></p>
                   </div>
                 </div>
-              </TabsContent>
+              </div>
+            )}
 
-              {/* Sign Up Form */}
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name</Label>
-                      <Input
-                        id="first-name"
-                        placeholder="John"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                        className="bg-background/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name</Label>
-                      <Input
-                        id="last-name"
-                        placeholder="Doe"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                        className="bg-background/50"
-                      />
-                    </div>
-                  </div>
-                  
+            {/* Sign Up Form */}
+            {activeTab === 'signup' && (
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email Address</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="pl-10 bg-background/50"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="first-name">First Name</Label>
                     <Input
-                      id="phone"
-                      placeholder="+27123456789"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="bg-background/50"
+                      id="first-name"
+                      placeholder="John"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
                     />
                   </div>
-                  
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="pl-10 bg-background/50"
-                      />
-                    </div>
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input
+                      id="last-name"
+                      placeholder="Doe"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="confirm-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        className="pl-10 bg-background/50"
-                      />
-                    </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="pl-10"
+                    />
                   </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+27123456789"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating account...
-                      </>
-                    ) : (
-                      'Create Account'
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
+                </Button>
+              </form>
+            )}
 
-            <div className="mt-6 pt-6 border-t border-border/50 text-center">
+            <div className="pt-6 border-t text-center">
               <Button
                 variant="ghost"
-                size="sm"
                 onClick={() => navigate('/')}
                 className="text-muted-foreground"
               >
