@@ -5,6 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "/Project-ZAR/", // 👈 Add this line for your repo name
   server: {
     host: "::",
     port: 8080,
@@ -30,6 +31,11 @@ export default defineConfig(({ mode }) => ({
     target: "es2020",
     rollupOptions: {
       external: [], // Ensure nothing is externalized
+      // 👇 Add this for SPA routing
+      input: {
+        main: "index.html",
+        "404": "404.html"
+      }
     },
   },
 }));
