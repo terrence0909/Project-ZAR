@@ -4,6 +4,12 @@ on:
   push:
     branches: [ main ]
 
+# 👇 ADD THIS PERMISSIONS SECTION
+permissions:
+  contents: write  # Allows pushing to gh-pages branch
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -21,6 +27,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}  # Ensure this is set
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
