@@ -33,8 +33,8 @@ export default defineConfig(({ mode }) => ({
       external: [], // Ensure nothing is externalized
       // 👇 Add this for SPA routing
       input: {
-        main: "index.html",
-        "404": "404.html"
+        main: "./index.html",
+        "404": "./public/404.html"
       }
     },
   },
