@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/contexts/AuthContext"; // Add this import
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardSidebarProps {
   lastUpdated: string;
@@ -15,7 +15,7 @@ interface DashboardSidebarProps {
 const menuItems = [
   { icon: Home, label: "Dashboard", path: "/dashboard" },
   { icon: Users, label: "Customers", path: "/customers" },
-  { icon: Upload, label: "Data Import", path: "/data-import" },
+  { icon: Upload, label: "Data Import", path: "/import" },
   { icon: AlertTriangle, label: "Risk Alerts", path: "/alerts", badge: 3 },
   { icon: TrendingUp, label: "Market Data", path: "/market" },
   { icon: FileText, label: "Reports", path: "/reports" },
@@ -25,7 +25,7 @@ const menuItems = [
 export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth(); // Get logout function from auth context
+  const { logout } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleNavigate = (path: string) => {
@@ -38,28 +38,25 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
 
   const handleLogout = async () => {
     try {
-      await logout(); // Call the logout function from your AuthContext
-      navigate("/auth"); // Redirect to login page after logout
+      await logout();
+      navigate("/auth");
     } catch (error) {
       console.error("Logout failed:", error);
-      // You can add toast notification here if needed
     }
   };
 
-  // If mobile prop is true, don't show the mobile header/overlay
   if (mobile) {
     return (
       <div className="h-full overflow-y-auto">
-        {/* Menu Items - Compact & Professional */}
         <nav className="space-y-1 p-3">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             
             return (
-              <button
+              <Link
                 key={item.path}
-                onClick={() => handleNavigate(item.path)}
+                to={item.path}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative w-full text-left",
                   "hover:bg-white/5 hover:shadow-lg hover:shadow-primary/5",
@@ -91,12 +88,11 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
                 {!item.badge && (
                   <div className="w-1 h-1 rounded-full bg-transparent group-hover:bg-primary/30 ml-auto"></div>
                 )}
-              </button>
+              </Link>
             );
           })}
         </nav>
 
-        {/* User Section - Compact */}
         <div className="p-3 border-t border-white/10 space-y-2.5">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5">
@@ -144,9 +140,7 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
 
   return (
     <>
-      {/* Desktop Sidebar - Professional Glass Design */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 glass-card border-r border-border/40 backdrop-blur-xl flex-col z-30">
-        {/* Logo with gradient */}
         <div className="p-5 border-b border-white/10 bg-gradient-to-r from-primary/10 to-transparent">
           <Link to="/dashboard" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -159,7 +153,6 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
           </Link>
         </div>
 
-        {/* Menu Items - Compact & Professional */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -205,7 +198,6 @@ export function DashboardSidebar({ lastUpdated, onNavigation, mobile = false }: 
           })}
         </nav>
 
-        {/* User Section - Compact */}
         <div className="p-3 border-t border-white/10 space-y-2.5 flex-shrink-0">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5">
