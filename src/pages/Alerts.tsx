@@ -2,7 +2,7 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle, XCircle, Filter, Bell, RefreshCw, ChevronRight, Check, X as XIcon, Loader2, Shield, Users, ArrowLeft } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, Filter, Bell, RefreshCw, ChevronRight, Check, X as XIcon, Loader2, Shield, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -287,7 +287,7 @@ const Alerts = () => {
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
-      <main className="flex-1 w-full overflow-x-hidden md:ml-64">
+      <main className="flex-1 w-full overflow-x-hidden ml-64">
         {/* Header */}
         <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-6 py-4">
           <div className="flex items-center justify-between gap-3">
@@ -297,9 +297,7 @@ const Alerts = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold">Risk Alerts</h1>
-                <p className="text-sm text-muted-foreground">
-                  Real-time risk monitoring
-                </p>
+                <p className="text-sm text-muted-foreground">Real-time risk monitoring</p>
               </div>
             </div>
             
@@ -396,9 +394,7 @@ const Alerts = () => {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <CardTitle>Risk Alerts</CardTitle>
-                  <CardDescription>
-                    Monitor and respond to security alerts
-                  </CardDescription>
+                  <CardDescription>Monitor and respond to security alerts</CardDescription>
                 </div>
                 <Badge variant="outline">
                   <div className={cn("w-2 h-2 rounded-full mr-2", alerts.length > 0 ? "bg-destructive" : "bg-success")} />
@@ -422,10 +418,7 @@ const Alerts = () => {
                       ? "No risk alerts detected in current data"
                       : "Import customer data to generate alerts"}
                   </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={fetchAlerts}
-                  >
+                  <Button variant="outline" onClick={fetchAlerts}>
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Check Again
                   </Button>
@@ -434,9 +427,7 @@ const Alerts = () => {
                 <div className="text-center py-12">
                   <Filter className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No matching alerts</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Try selecting a different filter
-                  </p>
+                  <p className="text-sm text-muted-foreground">Try selecting a different filter</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -574,9 +565,7 @@ const Alerts = () => {
             <Card className="glass-card border-border/50 mt-6">
               <CardHeader className="border-b border-border/50 p-6">
                 <CardTitle>Alert Statistics</CardTitle>
-                <CardDescription>
-                  24-hour alert summary
-                </CardDescription>
+                <CardDescription>24-hour alert summary</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-6">
