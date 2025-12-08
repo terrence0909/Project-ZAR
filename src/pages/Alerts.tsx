@@ -287,7 +287,7 @@ const Alerts = () => {
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
-      <main className="flex-1 w-full overflow-x-hidden">
+      <main className="flex-1 w-full overflow-x-hidden md:ml-64">
         {/* Mobile Header */}
         <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-3 xs:px-4 sm:px-6 py-3 xs:py-4">
           <div className="flex items-center justify-between gap-2 xs:gap-3">
