@@ -288,24 +288,16 @@ const Alerts = () => {
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
       <main className="flex-1 w-full overflow-x-hidden md:ml-64">
-        {/* Mobile Header */}
-        <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-3 xs:px-4 sm:px-6 py-3 xs:py-4">
-          <div className="flex items-center justify-between gap-2 xs:gap-3">
-            <div className="flex items-center gap-2 xs:gap-3 min-w-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(-1)}
-                className="h-8 w-8 xs:h-9 xs:w-9 p-0 flex-shrink-0"
-              >
-                <ArrowLeft className="w-4 h-4 xs:w-5 xs:h-5" />
-              </Button>
-              <div className="w-9 h-9 xs:w-10 xs:h-10 rounded-lg bg-destructive/20 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="w-4 h-4 xs:w-5 xs:h-5 text-destructive" />
+        {/* Header */}
+        <header className="sticky top-0 z-50 glass-card border-b border-border/50 backdrop-blur-md px-6 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-destructive/20 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
               </div>
-              <div className="min-w-0">
-                <h1 className="text-base xs:text-lg sm:text-xl font-bold truncate">Risk Alerts</h1>
-                <p className="text-xs xs:text-sm text-muted-foreground hidden xs:block">
+              <div>
+                <h1 className="text-xl font-bold">Risk Alerts</h1>
+                <p className="text-sm text-muted-foreground">
                   Real-time risk monitoring
                 </p>
               </div>
@@ -316,85 +308,78 @@ const Alerts = () => {
               size="sm"
               onClick={fetchAlerts}
               disabled={refreshing}
-              className="h-9 w-9 xs:h-10 xs:w-10 flex-shrink-0"
             >
               <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
             </Button>
           </div>
         </header>
 
-        {/* Filter Buttons - Horizontal Scrollable */}
-        <div className="sticky top-14 xs:top-16 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-1.5 xs:gap-2 px-3 xs:px-4 sm:px-6 py-2 xs:py-3 min-w-min">
-              <Button
-                variant={activeFilter === "active" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter("active")}
-                className="h-8 xs:h-9 text-xs xs:text-sm whitespace-nowrap flex-shrink-0"
-              >
-                <Bell className="w-3 h-3 xs:w-4 xs:h-4 mr-1 xs:mr-2" />
-                Active ({stats.active})
-              </Button>
-              <Button
-                variant={activeFilter === "reviewed" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter("reviewed")}
-                className="h-8 xs:h-9 text-xs xs:text-sm whitespace-nowrap flex-shrink-0"
-              >
-                <CheckCircle className="w-3 h-3 xs:w-4 xs:h-4 mr-1 xs:mr-2" />
-                Reviewed ({stats.reviewed})
-              </Button>
-              <Button
-                variant={activeFilter === "dismissed" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter("dismissed")}
-                className="h-8 xs:h-9 text-xs xs:text-sm whitespace-nowrap flex-shrink-0"
-              >
-                <XCircle className="w-3 h-3 xs:w-4 xs:h-4 mr-1 xs:mr-2" />
-                Dismissed ({stats.dismissed})
-              </Button>
-              <Button
-                variant={activeFilter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter("all")}
-                className="h-8 xs:h-9 text-xs xs:text-sm whitespace-nowrap flex-shrink-0"
-              >
-                <Filter className="w-3 h-3 xs:w-4 xs:h-4 mr-1 xs:mr-2" />
-                All ({stats.total})
-              </Button>
-            </div>
+        {/* Filter Buttons */}
+        <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
+          <div className="px-6 py-3 flex gap-2">
+            <Button
+              variant={activeFilter === "active" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter("active")}
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              Active ({stats.active})
+            </Button>
+            <Button
+              variant={activeFilter === "reviewed" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter("reviewed")}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Reviewed ({stats.reviewed})
+            </Button>
+            <Button
+              variant={activeFilter === "dismissed" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter("dismissed")}
+            >
+              <XCircle className="w-4 h-4 mr-2" />
+              Dismissed ({stats.dismissed})
+            </Button>
+            <Button
+              variant={activeFilter === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter("all")}
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              All ({stats.total})
+            </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="px-3 xs:px-4 sm:px-6 py-3 xs:py-4">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 xs:gap-3">
+        <div className="px-6 py-4">
+          <div className="grid grid-cols-3 gap-3">
             <Card className="glass-card border-border/50">
-              <CardContent className="p-2.5 xs:p-3 sm:p-4">
-                <div className="space-y-1 xs:space-y-2">
-                  <p className="text-xs xs:text-sm text-muted-foreground">Active Alerts</p>
-                  <p className="text-lg xs:text-xl sm:text-2xl font-bold">{stats.active}</p>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Active Alerts</p>
+                  <p className="text-2xl font-bold">{stats.active}</p>
                   <p className="text-xs text-muted-foreground">{stats.highRisk} high risk</p>
                 </div>
               </CardContent>
             </Card>
             
             <Card className="glass-card border-border/50">
-              <CardContent className="p-2.5 xs:p-3 sm:p-4">
-                <div className="space-y-1 xs:space-y-2">
-                  <p className="text-xs xs:text-sm text-muted-foreground">Under Review</p>
-                  <p className="text-lg xs:text-xl sm:text-2xl font-bold">{stats.reviewed}</p>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Under Review</p>
+                  <p className="text-2xl font-bold">{stats.reviewed}</p>
                   <p className="text-xs text-muted-foreground">{stats.mediumRisk} medium risk</p>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="glass-card border-border/50 col-span-2 lg:col-span-1">
-              <CardContent className="p-2.5 xs:p-3 sm:p-4">
-                <div className="space-y-1 xs:space-y-2">
-                  <p className="text-xs xs:text-sm text-muted-foreground">Total Alerts</p>
-                  <p className="text-lg xs:text-xl sm:text-2xl font-bold">{stats.total}</p>
+            <Card className="glass-card border-border/50">
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Total Alerts</p>
+                  <p className="text-2xl font-bold">{stats.total}</p>
                   <p className="text-xs text-muted-foreground">
                     {customerData.length > 0 ? `${customerData.length} customers` : "Monitoring"}
                   </p>
@@ -405,34 +390,34 @@ const Alerts = () => {
         </div>
 
         {/* Main Content */}
-        <div className="px-3 xs:px-4 sm:px-6 py-3 xs:py-4 pb-6">
+        <div className="px-6 py-4 pb-6">
           <Card className="glass-card border-border/50">
-            <CardHeader className="border-b border-border/50 p-3 xs:p-4 sm:p-6">
-              <div className="flex items-start justify-between gap-2 xs:gap-3">
-                <div className="min-w-0">
-                  <CardTitle className="text-base xs:text-lg sm:text-xl">Risk Alerts</CardTitle>
-                  <CardDescription className="text-xs xs:text-sm">
+            <CardHeader className="border-b border-border/50 p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Risk Alerts</CardTitle>
+                  <CardDescription>
                     Monitor and respond to security alerts
                   </CardDescription>
                 </div>
-                <Badge variant="outline" className="text-xs xs:text-sm whitespace-nowrap flex-shrink-0">
-                  <div className={cn("w-2 h-2 rounded-full mr-1 xs:mr-2", alerts.length > 0 ? "bg-destructive" : "bg-success")} />
+                <Badge variant="outline">
+                  <div className={cn("w-2 h-2 rounded-full mr-2", alerts.length > 0 ? "bg-destructive" : "bg-success")} />
                   {alerts.length > 0 ? "Live" : "No Alerts"}
                 </Badge>
               </div>
             </CardHeader>
             
-            <CardContent className="p-3 xs:p-4 sm:p-6">
+            <CardContent className="p-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center h-48">
                   <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                  <p className="text-sm xs:text-base text-muted-foreground">Loading alerts...</p>
+                  <p className="text-sm text-muted-foreground">Loading alerts...</p>
                 </div>
               ) : alerts.length === 0 ? (
-                <div className="text-center py-8 xs:py-12">
-                  <CheckCircle className="w-10 h-10 xs:w-12 xs:h-12 mx-auto text-muted-foreground/30 mb-3 xs:mb-4" />
-                  <h3 className="text-base xs:text-lg font-semibold mb-2">No alerts found</h3>
-                  <p className="text-xs xs:text-sm text-muted-foreground mb-4 xs:mb-6">
+                <div className="text-center py-12">
+                  <CheckCircle className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No alerts found</h3>
+                  <p className="text-sm text-muted-foreground mb-6">
                     {customerData.length > 0 
                       ? "No risk alerts detected in current data"
                       : "Import customer data to generate alerts"}
@@ -440,31 +425,30 @@ const Alerts = () => {
                   <Button 
                     variant="outline" 
                     onClick={fetchAlerts}
-                    className="gap-2 text-xs xs:text-sm h-9 xs:h-10"
                   >
-                    <RefreshCw className="w-3 h-3 xs:w-4 xs:h-4" />
+                    <RefreshCw className="w-4 h-4 mr-2" />
                     Check Again
                   </Button>
                 </div>
               ) : filteredAlerts.length === 0 ? (
-                <div className="text-center py-8 xs:py-12">
-                  <Filter className="w-10 h-10 xs:w-12 xs:h-12 mx-auto text-muted-foreground/30 mb-3 xs:mb-4" />
-                  <h3 className="text-base xs:text-lg font-semibold mb-2">No matching alerts</h3>
-                  <p className="text-xs xs:text-sm text-muted-foreground">
+                <div className="text-center py-12">
+                  <Filter className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No matching alerts</h3>
+                  <p className="text-sm text-muted-foreground">
                     Try selecting a different filter
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2 xs:space-y-3">
+                <div className="space-y-3">
                   {filteredAlerts.map((alert) => (
                     <div
                       key={alert.id}
-                      className="group p-3 xs:p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 hover-lift transition-all cursor-pointer"
+                      className="p-4 rounded-lg glass-card border border-border/50 hover:border-primary/50 transition-all"
                     >
-                      <div className="flex items-start justify-between gap-2 xs:gap-3 mb-2 xs:mb-3">
-                        <div className="flex items-start gap-2 xs:gap-3 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-start gap-3 flex-1">
                           <div className="relative flex-shrink-0">
-                            <div className="w-8 h-8 xs:w-10 xs:h-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-background">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-background">
                               {getStatusIcon(alert.status)}
                             </div>
                             <Badge 
@@ -477,28 +461,28 @@ const Alerts = () => {
                             </Badge>
                           </div>
                           
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1 xs:gap-2 mb-0.5 xs:mb-1 flex-wrap">
-                              <h3 className="font-semibold text-xs xs:text-sm truncate">{alert.type}</h3>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-sm">{alert.type}</h3>
                               <Badge variant="outline" className="text-xs flex-shrink-0">
                                 {alert.time}
                               </Badge>
                             </div>
                             
-                            <div className="flex items-center gap-1 xs:gap-2 text-xs text-muted-foreground flex-wrap">
-                              <span className="font-mono text-xs">{truncateAddress(alert.wallet)}</span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span className="font-mono">{truncateAddress(alert.wallet)}</span>
                               {alert.amount && (
-                                <span className="text-primary font-medium text-xs">{alert.amount}</span>
+                                <span className="text-primary font-medium">{alert.amount}</span>
                               )}
                             </div>
                           </div>
                         </div>
                         
-                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       </div>
                       
-                      <div className="space-y-2 xs:space-y-2.5">
-                        <div className="text-xs xs:text-sm text-muted-foreground line-clamp-2">
+                      <div className="space-y-2">
+                        <div className="text-sm text-muted-foreground line-clamp-2">
                           {alert.description}
                         </div>
                         
@@ -509,14 +493,14 @@ const Alerts = () => {
                           </div>
                         )}
                         
-                        <div className="flex items-center justify-between pt-2 xs:pt-3 border-t border-border/30 gap-2">
-                          <div className="flex items-center gap-2 xs:gap-4 min-w-0">
-                            <div className="min-w-fit">
+                        <div className="flex items-center justify-between pt-3 border-t border-border/30 gap-2">
+                          <div className="flex items-center gap-4">
+                            <div>
                               <p className="text-xs text-muted-foreground">Risk Score</p>
-                              <p className="font-semibold text-xs xs:text-sm">{alert.risk_score || "N/A"}</p>
+                              <p className="font-semibold text-sm">{alert.risk_score || "N/A"}</p>
                             </div>
                             
-                            <div className="min-w-fit">
+                            <div>
                               <p className="text-xs text-muted-foreground">Status</p>
                               <Badge className={cn("text-xs", 
                                 alert.status === "active" ? "bg-warning/20 text-warning" :
@@ -537,10 +521,10 @@ const Alerts = () => {
                                   e.stopPropagation();
                                   handleReviewAlert(alert.id);
                                 }}
-                                className="h-7 w-7 xs:h-8 xs:w-8"
+                                className="h-8 w-8"
                                 title="Review Alert"
                               >
-                                <Check className="w-3 h-3 xs:w-4 xs:h-4" />
+                                <Check className="w-4 h-4" />
                               </Button>
                               <Button
                                 size="sm"
@@ -549,10 +533,10 @@ const Alerts = () => {
                                   e.stopPropagation();
                                   handleDismissAlert(alert.id);
                                 }}
-                                className="h-7 w-7 xs:h-8 xs:w-8 text-destructive hover:text-destructive"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
                                 title="Dismiss Alert"
                               >
-                                <XIcon className="w-3 h-3 xs:w-4 xs:h-4" />
+                                <XIcon className="w-4 h-4" />
                               </Button>
                             </div>
                           )}
@@ -564,10 +548,10 @@ const Alerts = () => {
               )}
               
               {alerts.length > 0 && (
-                <div className="mt-4 xs:mt-6 pt-4 xs:pt-6 border-t border-border/50 flex items-center justify-between text-xs xs:text-sm text-muted-foreground gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
+                <div className="mt-6 pt-6 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <div className={cn("w-2 h-2 rounded-full flex-shrink-0", alerts.length > 0 ? "bg-destructive" : "bg-success")} />
-                    <span className="text-xs xs:text-sm truncate">
+                    <span>
                       {customerData.length > 0 
                         ? `${customerData.length} customers`
                         : "Sample data"}
@@ -577,7 +561,7 @@ const Alerts = () => {
                     variant="link" 
                     size="sm" 
                     onClick={fetchAlerts}
-                    className="text-primary h-auto p-0 text-xs xs:text-sm flex-shrink-0"
+                    className="text-primary h-auto p-0"
                   >
                     Refresh
                   </Button>
@@ -587,18 +571,18 @@ const Alerts = () => {
           </Card>
 
           {alerts.length > 0 && (
-            <Card className="glass-card border-border/50 mt-4 xs:mt-6">
-              <CardHeader className="border-b border-border/50 p-3 xs:p-4 sm:p-6">
-                <CardTitle className="text-base xs:text-lg sm:text-xl">Alert Statistics</CardTitle>
-                <CardDescription className="text-xs xs:text-sm">
+            <Card className="glass-card border-border/50 mt-6">
+              <CardHeader className="border-b border-border/50 p-6">
+                <CardTitle>Alert Statistics</CardTitle>
+                <CardDescription>
                   24-hour alert summary
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 xs:p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 xs:gap-6">
-                  <div className="space-y-2.5 xs:space-y-3">
-                    <h4 className="font-semibold text-sm xs:text-base">Risk Distribution</h4>
-                    <div className="space-y-2 text-xs xs:text-sm text-muted-foreground">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">Risk Distribution</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full bg-destructive flex-shrink-0" />
@@ -622,9 +606,9 @@ const Alerts = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2.5 xs:space-y-3">
-                    <h4 className="font-semibold text-sm xs:text-base">System Status</h4>
-                    <div className="space-y-2 text-xs xs:text-sm text-muted-foreground">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">System Status</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center justify-between gap-2">
                         <span>Last Updated</span>
                         <span className="font-semibold flex-shrink-0">{getTimeAgo()}</span>
