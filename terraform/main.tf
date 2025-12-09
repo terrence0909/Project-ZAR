@@ -352,12 +352,12 @@ resource "aws_lambda_function" "search" {
 
   environment {
     variables = {
-      CUSTOMERS_TABLE      = aws_dynamodb_table.customers.name
-      WALLETS_TABLE        = aws_dynamodb_table.wallets.name
-      TRANSACTIONS_TABLE   = aws_dynamodb_table.transactions.name
-      RISK_REGISTRY_TABLE  = aws_dynamodb_table.risk_registry.name
+      CUSTOMERS_TABLE       = aws_dynamodb_table.customers.name
+      WALLETS_TABLE         = aws_dynamodb_table.wallets.name
+      TRANSACTIONS_TABLE    = aws_dynamodb_table.transactions.name
+      RISK_REGISTRY_TABLE   = aws_dynamodb_table.risk_registry.name
       WALLET_CLUSTERS_TABLE = aws_dynamodb_table.wallet_clusters.name
-      S3_BUCKET            = aws_s3_bucket.reports.id
+      S3_BUCKET             = aws_s3_bucket.reports.id
     }
   }
 
@@ -385,10 +385,10 @@ resource "aws_lambda_function" "graph" {
 
   environment {
     variables = {
-      CUSTOMERS_TABLE      = aws_dynamodb_table.customers.name
-      WALLETS_TABLE        = aws_dynamodb_table.wallets.name
-      TRANSACTIONS_TABLE   = aws_dynamodb_table.transactions.name
-      RISK_REGISTRY_TABLE  = aws_dynamodb_table.risk_registry.name
+      CUSTOMERS_TABLE       = aws_dynamodb_table.customers.name
+      WALLETS_TABLE         = aws_dynamodb_table.wallets.name
+      TRANSACTIONS_TABLE    = aws_dynamodb_table.transactions.name
+      RISK_REGISTRY_TABLE   = aws_dynamodb_table.risk_registry.name
       WALLET_CLUSTERS_TABLE = aws_dynamodb_table.wallet_clusters.name
     }
   }
@@ -417,12 +417,12 @@ resource "aws_lambda_function" "report" {
 
   environment {
     variables = {
-      CUSTOMERS_TABLE      = aws_dynamodb_table.customers.name
-      WALLETS_TABLE        = aws_dynamodb_table.wallets.name
-      TRANSACTIONS_TABLE   = aws_dynamodb_table.transactions.name
-      RISK_REGISTRY_TABLE  = aws_dynamodb_table.risk_registry.name
+      CUSTOMERS_TABLE       = aws_dynamodb_table.customers.name
+      WALLETS_TABLE         = aws_dynamodb_table.wallets.name
+      TRANSACTIONS_TABLE    = aws_dynamodb_table.transactions.name
+      RISK_REGISTRY_TABLE   = aws_dynamodb_table.risk_registry.name
       WALLET_CLUSTERS_TABLE = aws_dynamodb_table.wallet_clusters.name
-      S3_BUCKET            = aws_s3_bucket.reports.id
+      S3_BUCKET             = aws_s3_bucket.reports.id
     }
   }
 
@@ -490,6 +490,34 @@ resource "aws_lambda_function" "etherscan_enrichment" {
   tags = {
     Name = "${var.project_name}-etherscan-enrichment"
   }
+}
+
+# VALR Enrichment Lambda Function
+resource "aws_lambda_function" "valr_enrichment" {
+  filename      = "lambda_valr.zip"
+  function_name = "${var.project_name}-valr-enrichment"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "index.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 30
+  memory_size   = 256
+
+  environment {
+    variables = {
+      VALR_API_KEY     = var.valr_api_key
+      VALR_API_SECRET  = var.valr_api_secret
+      VALR_PROXY_URL   = var.valr_proxy_url
+      WALLETS_TABLE    = aws_dynamodb_table.wallets.name
+    }
+  }
+
+  tags = {
+    Name = "${var.project_name}-valr-enrichment"
+  }
+
+  depends_on = [
+    aws_dynamodb_table.wallets
+  ]
 }
 
 # ============================================
@@ -803,6 +831,84 @@ resource "aws_api_gateway_method_response" "report_options" {
   }
 }
 
+# /valr endpoint
+resource "aws_api_gateway_resource" "valr" {
+  rest_api_id = aws_api_gateway_rest_api.zar.id
+  parent_id   = aws_api_gateway_rest_api.zar.root_resource_id
+  path_part   = "valr"
+}
+
+resource "aws_api_gateway_method" "valr_post" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = "POST"
+  authorization    = "NONE"
+}
+
+resource "aws_api_gateway_integration" "valr_lambda" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = aws_api_gateway_method.valr_post.http_method
+  type             = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri              = aws_lambda_function.valr_enrichment.invoke_arn
+}
+
+resource "aws_lambda_permission" "valr_api" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.valr_enrichment.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.zar.execution_arn}/*/*"
+}
+
+# CORS for /valr - simplified for AWS_PROXY
+resource "aws_api_gateway_method" "valr_options" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = "OPTIONS"
+  authorization    = "NONE"
+}
+
+resource "aws_api_gateway_integration" "valr_options" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = aws_api_gateway_method.valr_options.http_method
+  type             = "MOCK"
+  
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "valr_options" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = aws_api_gateway_method.valr_options.http_method
+  status_code      = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+
+  depends_on = [aws_api_gateway_integration.valr_options]
+}
+
+resource "aws_api_gateway_method_response" "valr_options" {
+  rest_api_id      = aws_api_gateway_rest_api.zar.id
+  resource_id      = aws_api_gateway_resource.valr.id
+  http_method      = aws_api_gateway_method.valr_options.http_method
+  status_code      = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
 # API Deployment
 resource "aws_api_gateway_deployment" "zar" {
   depends_on = [
@@ -811,7 +917,9 @@ resource "aws_api_gateway_deployment" "zar" {
     aws_api_gateway_integration.graph_lambda,
     aws_api_gateway_integration.graph_options,
     aws_api_gateway_integration.report_lambda,
-    aws_api_gateway_integration.report_options
+    aws_api_gateway_integration.report_options,
+    aws_api_gateway_integration.valr_lambda,
+    aws_api_gateway_integration.valr_options
   ]
 
   rest_api_id = aws_api_gateway_rest_api.zar.id

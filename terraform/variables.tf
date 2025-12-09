@@ -1,4 +1,3 @@
-
 variable "aws_region" {
   description = "AWS region for resources"
   type        = string
@@ -33,4 +32,22 @@ variable "etherscan_api_key" {
   description = "Etherscan API key"
   type        = string
   sensitive   = true
+}
+
+variable "valr_api_key" {
+  description = "VALR API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "valr_api_secret" {
+  description = "VALR API Secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "valr_proxy_url" {
+  description = "Optional proxy URL for VALR API"
+  type        = string
+  default     = "https://api.valr.com"
 }

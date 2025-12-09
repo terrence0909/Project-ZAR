@@ -1,21 +1,26 @@
 output "api_gateway_url" {
   description = "API Gateway base URL for frontend"
-  value       = "${aws_api_gateway_deployment.zar.invoke_url}"
+  value       = "https://${aws_api_gateway_rest_api.zar.id}.execute-api.${var.aws_region}.amazonaws.com/${var.environment}"
 }
 
 output "search_endpoint" {
   description = "Search API endpoint"
-  value       = "${aws_api_gateway_deployment.zar.invoke_url}/search"
+  value       = "https://${aws_api_gateway_rest_api.zar.id}.execute-api.${var.aws_region}.amazonaws.com/${var.environment}/search"
 }
 
 output "graph_endpoint" {
   description = "Graph API endpoint"
-  value       = "${aws_api_gateway_deployment.zar.invoke_url}/graph"
+  value       = "https://${aws_api_gateway_rest_api.zar.id}.execute-api.${var.aws_region}.amazonaws.com/${var.environment}/graph"
 }
 
 output "report_endpoint" {
   description = "Report API endpoint"
-  value       = "${aws_api_gateway_deployment.zar.invoke_url}/report"
+  value       = "https://${aws_api_gateway_rest_api.zar.id}.execute-api.${var.aws_region}.amazonaws.com/${var.environment}/report"
+}
+
+output "valr_endpoint" {
+  description = "VALR API endpoint"
+  value       = "https://${aws_api_gateway_rest_api.zar.id}.execute-api.${var.aws_region}.amazonaws.com/${var.environment}/valr"
 }
 
 output "search_lambda_arn" {
@@ -31,6 +36,21 @@ output "graph_lambda_arn" {
 output "report_lambda_arn" {
   description = "Report Lambda function ARN"
   value       = aws_lambda_function.report.arn
+}
+
+output "valr_lambda_arn" {
+  description = "VALR Lambda function ARN"
+  value       = aws_lambda_function.valr_enrichment.arn
+}
+
+output "luno_lambda_arn" {
+  description = "Luno Lambda function ARN"
+  value       = aws_lambda_function.luno_enrichment.arn
+}
+
+output "etherscan_lambda_arn" {
+  description = "Etherscan Lambda function ARN"
+  value       = aws_lambda_function.etherscan_enrichment.arn
 }
 
 output "s3_reports_bucket" {
