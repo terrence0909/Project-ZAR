@@ -38,6 +38,7 @@ import {
 // Your APIs
 const CUSTOMERS_API_ENDPOINT = `${import.meta.env.VITE_API_BASE_URL}/customers`;
 const LUNO_API_ENDPOINT = 'https://6duobrslvyityfkazhdl2e4cpu0qqacs.lambda-url.us-east-1.on.aws/';
+const VALR_API_ENDPOINT = `${import.meta.env.VITE_API_BASE_URL}/valr`;
 
 interface DashboardStats {
   totalCustomers: number;
@@ -75,13 +76,22 @@ interface MarketPrice {
   timestamp: number;
 }
 
+interface ValrBalance {
+  currency: string;
+  available: string;
+  reserved: string;
+  total: string;
+}
+
 const Dashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [marketPrices, setMarketPrices] = useState<MarketPrice[]>([]);
+  const [valrBalances, setValrBalances] = useState<ValrBalance[]>([]);
   const [lunoError, setLunoError] = useState<string | null>(null);
   const [customersError, setCustomersError] = useState<string | null>(null);
+  const [valrError, setValrError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
@@ -137,6 +147,36 @@ const Dashboard = () => {
     }
   };
 
+  const fetchValrData = async () => {
+    try {
+      console.log("💰 Fetching VALR wallet balances...");
+      
+      const response = await fetch(VALR_API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'balances' })
+      });
+
+      if (!response.ok) {
+        throw new Error(`VALR API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("✅ VALR data received:", data);
+      
+      if (data.data && Array.isArray(data.data)) {
+        setValrBalances(data.data);
+      }
+      setValrError(null);
+      
+    } catch (err) {
+      console.error('❌ VALR fetch error:', err);
+      setValrError(err instanceof Error ? err.message : 'Failed to load VALR data');
+    }
+  };
+
   const fetchCustomersData = async () => {
     try {
       console.log("📊 Fetching customers data for dashboard...");
@@ -175,11 +215,13 @@ const Dashboard = () => {
       setIsRefreshing(true);
       setCustomersError(null);
       setLunoError(null);
+      setValrError(null);
       
-      // Fetch both data sources in parallel
+      // Fetch all data sources in parallel
       await Promise.all([
         fetchCustomersData(),
-        fetchLunoData()
+        fetchLunoData(),
+        fetchValrData()
       ]);
       
       setLastUpdated(new Date());
@@ -276,6 +318,7 @@ const Dashboard = () => {
       const exportData = {
         dashboardStats,
         marketPrices,
+        valrBalances,
         exportedAt: new Date().toISOString(),
         customerCount: dashboardStats.totalCustomers,
         riskDistribution: dashboardStats.riskDistribution
@@ -307,7 +350,7 @@ const Dashboard = () => {
     return `${Math.floor(hours / 24)} day ago`;
   };
 
-  const hasError = customersError || lunoError;
+  const hasError = customersError || lunoError || valrError;
 
   const handleSidebarNavigation = (path: string) => {
     setSidebarOpen(false);
@@ -528,7 +571,7 @@ const Dashboard = () => {
             <div className="md:hidden mt-2 text-xs text-muted-foreground">
               <div>Last updated: {getTimeAgo()}</div>
               {dashboardStats && (
-                <div>{dashboardStats.totalCustomers} customers • {dashboardStats.totalWallets} wallets</div>
+                <div>{dashboardStats.totalCustomers} customers • {dashboardStats.totalWallets} wallets • {valrBalances.length} assets</div>
               )}
             </div>
           </div>
@@ -547,6 +590,7 @@ const Dashboard = () => {
                   <div className="text-xs text-destructive/80 mt-1 space-y-0.5">
                     {customersError && <div>• Customers API: {customersError}</div>}
                     {lunoError && <div>• Luno API: {lunoError}</div>}
+                    {valrError && <div>• VALR API: {valrError}</div>}
                   </div>
                   <div className="flex gap-2 mt-2">
                     <Button
@@ -579,6 +623,10 @@ const Dashboard = () => {
                       <div className="w-2 h-2 rounded-full bg-success"></div>
                       <span>Luno Market Data</span>
                     </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full bg-info"></div>
+                      <span>VALR Wallets</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -586,6 +634,22 @@ const Dashboard = () => {
           ) : (
             <div className="space-y-6 md:space-y-8">
               <KPICards stats={dashboardStats} loading={isLoading} />
+              
+              {/* VALR Balances Card */}
+              {valrBalances.length > 0 && (
+                <div className="rounded-lg border border-border/50 p-6 bg-card">
+                  <h3 className="text-lg font-semibold mb-4">VALR Wallet Balances</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {valrBalances.slice(0, 8).map((balance) => (
+                      <div key={balance.currency} className="rounded p-3 bg-muted/50">
+                        <p className="text-xs text-muted-foreground mb-1">{balance.currency}</p>
+                        <p className="text-sm font-semibold">{parseFloat(balance.total).toFixed(4)}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Available: {parseFloat(balance.available).toFixed(4)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               {/* Charts Section */}
               <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-6">
