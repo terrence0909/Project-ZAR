@@ -9,6 +9,8 @@ from datetime import datetime
 
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
+CUSTOMERS_TABLE_NAME = os.environ.get('CUSTOMERS_TABLE', 'project-zar-customers')
+customers_table = dynamodb.Table(CUSTOMERS_TABLE_NAME)
 
 # VALR credentials
 VALR_API_KEY = os.environ.get('VALR_API_KEY')
@@ -18,6 +20,7 @@ VALR_BASE_URL = os.environ.get('VALR_PROXY_URL', 'https://api.valr.com')
 print(f"[INIT] VALR Client Initialized.")
 print(f"[INIT] Base URL: {VALR_BASE_URL}")
 print(f"[INIT] API Key present: {'Yes' if VALR_API_KEY else 'No'}")
+print(f"[INIT] DynamoDB Table: {CUSTOMERS_TABLE_NAME}")
 
 # CORS Headers
 CORS_HEADERS = {
@@ -26,6 +29,66 @@ CORS_HEADERS = {
     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS'
 }
+
+def get_valr_balances_from_dynamodb():
+    """Get VALR balances from DynamoDB (your imported data) - SIMPLE FORMAT VERSION"""
+    try:
+        print(f"[DYNAMODB] Scanning table: {CUSTOMERS_TABLE_NAME}")
+        response = customers_table.scan()
+        customers = response.get('Items', [])
+        print(f"[DYNAMODB] Found {len(customers)} customers")
+        
+        valr_balances = []
+        
+        for customer in customers:
+            # Get customer_id (handle both string and {'S': string} formats)
+            customer_id = customer.get('customer_id', '')
+            if isinstance(customer_id, dict) and 'S' in customer_id:
+                customer_id = customer_id['S']
+            
+            # Check for exchange accounts
+            if 'exchange_accounts' in customer:
+                exchange = customer['exchange_accounts']
+                
+                # Check if it's a VALR account
+                exchange_name = exchange.get('exchange_name', '')
+                if isinstance(exchange_name, dict) and 'S' in exchange_name:
+                    exchange_name = exchange_name['S']
+                
+                # Case-insensitive check for VALR
+                if exchange_name and 'VALR' in exchange_name.upper():
+                    print(f"[DYNAMODB] Found VALR account for customer: {customer_id}")
+                    
+                    # Get balances (already in simple format from your XML import)
+                    balances = exchange.get('balances', [])
+                    print(f"[DYNAMODB] Found {len(balances)} balance items")
+                    
+                    for balance in balances:
+                        # Data is in SIMPLE format: {'currency': 'BTC', 'available': '1.25', ...}
+                        # NOT DynamoDB JSON format: {'currency': {'S': 'BTC'}, 'available': {'N': '1.25'}, ...}
+                        valr_balances.append({
+                            'currency': str(balance.get('currency', '')),
+                            'available': str(balance.get('available', '0')),
+                            'reserved': str(balance.get('reserved', '0')),
+                            'total': str(balance.get('total', '0')),
+                            'lendReserved': '0',
+                            'borrowReserved': '0',
+                            'borrowedAmount': '0',
+                            'totalInReference': '0',
+                            'totalInReferenceWeighted': '0',
+                            'referenceCurrency': 'USDC',
+                            'source': 'dynamodb_import',
+                            'customer_id': customer_id
+                        })
+        
+        print(f"[DYNAMODB] Total VALR balances found: {len(valr_balances)}")
+        return valr_balances
+        
+    except Exception as e:
+        print(f"[DYNAMODB] ERROR: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 class VALRClient:
     def __init__(self, api_key, api_secret):
@@ -155,6 +218,27 @@ def lambda_handler(event, context):
         action = body.get('action', 'ticker')
         print(f"[HANDLER] Action determined: '{action}'")
 
+        # For balances action: Check DynamoDB first
+        if action == 'balances':
+            print(f"[HANDLER] Checking DynamoDB for imported VALR data first...")
+            dynamodb_balances = get_valr_balances_from_dynamodb()
+            
+            if dynamodb_balances:
+                print(f"[HANDLER] Found {len(dynamodb_balances)} VALR balances in DynamoDB")
+                return {
+                    'statusCode': 200,
+                    'headers': CORS_HEADERS,
+                    'body': json.dumps({
+                        'success': True,
+                        'data': dynamodb_balances,
+                        'source': 'dynamodb',
+                        'message': f'Showing {len(dynamodb_balances)} imported VALR balances',
+                        'timestamp': datetime.utcnow().isoformat()
+                    })
+                }
+            else:
+                print(f"[HANDLER] No VALR data in DynamoDB, using VALR API")
+
         # Initialize VALR client
         valr = VALRClient(VALR_API_KEY, VALR_API_SECRET)
 
@@ -205,8 +289,7 @@ if __name__ == "__main__":
     # Test with mock event
     test_event = {
         'body': json.dumps({
-            'action': 'ticker',
-            'pair': 'BTCZAR'
+            'action': 'balances'
         })
     }
     result = lambda_handler(test_event, None)

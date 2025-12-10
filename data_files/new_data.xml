@@ -4,16 +4,21 @@
     <source>FIRST_NATIONAL_BANK_CRYPTO_COMPLIANCE</source>
     <timestamp>2025-03-15T09:30:00+02:00</timestamp>
     <version>2.1</version>
+    <jurisdiction>ZA</jurisdiction>
+    <vasp_registration_number>FSP123456</vasp_registration_number>
   </metadata>
   
   <customers>
-    <!-- Sipho Mthembu -->
+    <!-- Sipho Mthembu - Business Owner -->
     <customer>
       <customer_id>FNB_CUST_ZA_2023014587</customer_id>
       <sa_id>8805065147089</sa_id>
       <first_name>Sipho</first_name>
       <last_name>Mthembu</last_name>
-      <email>sipho.mthembu@email.com</email>
+      <email>sipho.mthembu@mthembuenterprises.co.za</email>
+      <phone>+27821234567</phone>
+      <occupation>Import/Export Business Owner</occupation>
+      <residential_address>123 Vilakazi Street, Soweto, Johannesburg, 1804</residential_address>
       <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
       <created_at>2023-01-15T00:00:00Z</created_at>
       <last_kyc_review>2024-12-10T00:00:00Z</last_kyc_review>
@@ -21,15 +26,21 @@
       <risk_score>78</risk_score>
       <pep_status>false</pep_status>
       <fic_risk_category>HIGH</fic_risk_category>
+      <source_of_funds>BUSINESS_INCOME</source_of_funds>
+      <expected_monthly_volume>750000</expected_monthly_volume>
+      <expected_annual_volume>9000000</expected_annual_volume>
     </customer>
     
-    <!-- Naledi Petersen -->
+    <!-- Naledi Petersen - Tech Professional -->
     <customer>
       <customer_id>FNB_CUST_ZA_2023089123</customer_id>
       <sa_id>9507185284087</sa_id>
       <first_name>Naledi</first_name>
       <last_name>Petersen</last_name>
-      <email>naledi.p@techcompany.co.za</email>
+      <email>naledi.petersen@fintechstartup.co.za</email>
+      <phone>+27837654321</phone>
+      <occupation>Senior Blockchain Developer</occupation>
+      <residential_address>45 Kloof Street, Gardens, Cape Town, 8001</residential_address>
       <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
       <created_at>2023-08-05T00:00:00Z</created_at>
       <last_kyc_review>2024-11-15T00:00:00Z</last_kyc_review>
@@ -37,15 +48,21 @@
       <risk_score>42</risk_score>
       <pep_status>false</pep_status>
       <fic_risk_category>MEDIUM</fic_risk_category>
+      <source_of_funds>SALARY</source_of_funds>
+      <expected_monthly_volume>250000</expected_monthly_volume>
+      <expected_annual_volume>3000000</expected_annual_volume>
     </customer>
     
-    <!-- Johannes Van der Merwe -->
+    <!-- Johannes Van der Merwe - Retired Accountant -->
     <customer>
       <customer_id>FNB_CUST_ZA_2022056734</customer_id>
       <sa_id>5502035112085</sa_id>
       <first_name>Johannes</first_name>
       <last_name>Van der Merwe</last_name>
-      <email>johannes.vdm@gmail.com</email>
+      <email>johannes.vandermerwe@email.co.za</email>
+      <phone>+27839876543</phone>
+      <occupation>Retired Chartered Accountant</occupation>
+      <residential_address>78 Church Street, Pretoria Central, Pretoria, 0002</residential_address>
       <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
       <created_at>2022-05-20T00:00:00Z</created_at>
       <last_kyc_review>2024-10-05T00:00:00Z</last_kyc_review>
@@ -53,27 +70,83 @@
       <risk_score>18</risk_score>
       <pep_status>false</pep_status>
       <fic_risk_category>LOW</fic_risk_category>
+      <source_of_funds>PENSION_INVESTMENTS</source_of_funds>
+      <expected_monthly_volume>50000</expected_monthly_volume>
+      <expected_annual_volume>600000</expected_annual_volume>
     </customer>
     
-    <!-- Mandla Zulu -->
+    <!-- Mandla Zulu - Member of Parliament -->
     <customer>
       <customer_id>FNB_CUST_ZA_2024067890</customer_id>
       <sa_id>7006155287081</sa_id>
       <first_name>Mandla</first_name>
       <last_name>Zulu</last_name>
-      <email>mandla.z@parliament.gov.za</email>
+      <email>mandla.zulu@parliament.gov.za</email>
+      <phone>+27831234567</phone>
+      <occupation>Member of Parliament</occupation>
+      <residential_address>Parliamentary Village, Acacia Park, Cape Town, 8001</residential_address>
       <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
       <created_at>2024-06-01T00:00:00Z</created_at>
       <last_kyc_review>2025-01-15T00:00:00Z</last_kyc_review>
       <kyc_status>VERIFIED_ENHANCED</kyc_status>
       <risk_score>85</risk_score>
       <pep_status>true</pep_status>
+      <pep_role>MEMBER_OF_PARLIAMENT</pep_role>
       <fic_risk_category>HIGH</fic_risk_category>
+      <source_of_funds>PARLIAMENTARY_SALARY</source_of_funds>
+      <expected_monthly_volume>350000</expected_monthly_volume>
+      <expected_annual_volume>4200000</expected_annual_volume>
+    </customer>
+    
+    <!-- Additional realistic customers -->
+    
+    <!-- Thandiwe Nkosi - Medical Doctor -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2023072345</customer_id>
+      <sa_id>8912235198083</sa_id>
+      <first_name>Thandiwe</first_name>
+      <last_name>Nkosi</last_name>
+      <email>dr.thandiwe.nkosi@mediclinic.co.za</email>
+      <phone>+27844561234</phone>
+      <occupation>Medical Specialist</occupation>
+      <residential_address>12 Rivonia Road, Sandton, Johannesburg, 2196</residential_address>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2023-07-15T00:00:00Z</created_at>
+      <last_kyc_review>2024-09-20T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+      <risk_score>35</risk_score>
+      <pep_status>false</pep_status>
+      <fic_risk_category>MEDIUM</fic_risk_category>
+      <source_of_funds>MEDICAL_PRACTICE</source_of_funds>
+      <expected_monthly_volume>450000</expected_monthly_volume>
+      <expected_annual_volume>5400000</expected_annual_volume>
+    </customer>
+    
+    <!-- Bongani Khumalo - Mining Executive -->
+    <customer>
+      <customer_id>FNB_CUST_ZA_2022098765</customer_id>
+      <sa_id>7703125197082</sa_id>
+      <first_name>Bongani</first_name>
+      <last_name>Khumalo</last_name>
+      <email>b.khumalo@angloamerican.co.za</email>
+      <phone>+27835678901</phone>
+      <occupation>Mining Executive</occupation>
+      <residential_address>8 West Street, Houghton Estate, Johannesburg, 2198</residential_address>
+      <vasp_id>FNB_DIGITAL_ASSETS</vasp_id>
+      <created_at>2022-09-10T00:00:00Z</created_at>
+      <last_kyc_review>2024-08-15T00:00:00Z</last_kyc_review>
+      <kyc_status>VERIFIED</kyc_status>
+      <risk_score>65</risk_score>
+      <pep_status>false</pep_status>
+      <fic_risk_category>HIGH</fic_risk_category>
+      <source_of_funds>EXECUTIVE_SALARY_BONUS</source_of_funds>
+      <expected_monthly_volume>1200000</expected_monthly_volume>
+      <expected_annual_volume>14400000</expected_annual_volume>
     </customer>
   </customers>
   
   <wallets>
-    <!-- Sipho Mthembu - Ethereum wallet -->
+    <!-- Sipho Mthembu - Primary Ethereum wallet -->
     <wallet>
       <wallet_id>FNB_WALLET_ETH_8805065147089_001</wallet_id>
       <customer_id>FNB_CUST_ZA_2023014587</customer_id>
@@ -88,6 +161,7 @@
       <last_activity>2025-03-14T00:00:00Z</last_activity>
       <transaction_count>456</transaction_count>
       <zar_value>1242500.00</zar_value>
+      <flags>HIGH_FREQUENCY_TRADING</flags>
     </wallet>
     
     <!-- Sipho Mthembu - Undeclared Bitcoin wallet -->
@@ -161,5 +235,222 @@
       <zar_value>625000.00</zar_value>
       <flags>POLITICALLY_EXPOSED_PERSON,HIGH_VALUE_TRANSACTIONS</flags>
     </wallet>
+    
+    <!-- Thandiwe Nkosi - Bitcoin wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_BTC_8912235198083_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2023072345</customer_id>
+      <wallet_address>bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</wallet_address>
+      <blockchain>bitcoin</blockchain>
+      <declared>true</declared>
+      <risk_score>35</risk_score>
+      <balance>1.25</balance>
+      <currency>BTC</currency>
+      <created_at>2022-11-30T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-11T00:00:00Z</last_activity>
+      <transaction_count>89</transaction_count>
+      <zar_value>1232500.00</zar_value>
+      <flags>LONG_TERM_HOLDING</flags>
+    </wallet>
+    
+    <!-- Bongani Khumalo - Ethereum wallet -->
+    <wallet>
+      <wallet_id>FNB_WALLET_ETH_7703125197082_001</wallet_id>
+      <customer_id>FNB_CUST_ZA_2022098765</customer_id>
+      <wallet_address>0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed</wallet_address>
+      <blockchain>ethereum</blockchain>
+      <declared>true</declared>
+      <risk_score>65</risk_score>
+      <balance>18.75</balance>
+      <currency>ETH</currency>
+      <created_at>2021-06-15T00:00:00Z</created_at>
+      <source>vasp_integration</source>
+      <last_activity>2025-03-13T00:00:00Z</last_activity>
+      <transaction_count>321</transaction_count>
+      <zar_value>937500.00</zar_value>
+      <flags>NFT_MARKETPLACE_INTERACTION</flags>
+    </wallet>
   </wallets>
+  
+  <!-- EXCHANGE ACCOUNTS SECTION - Real exchange data -->
+  <exchange_accounts>
+    <!-- Sipho Mthembu - VALR Exchange Account -->
+    <exchange_account>
+      <customer_id>FNB_CUST_ZA_2023014587</customer_id>
+      <exchange_name>VALR</exchange_name>
+      <exchange_user_id>VALR_USER_8805065147089</exchange_user_id>
+      <account_created>2022-04-15T00:00:00Z</account_created>
+      <kyc_status>VERIFIED</kyc_status>
+      <trading_tier>VIP_3</trading_tier>
+      <balances>
+        <balance>
+          <currency>BTC</currency>
+          <available>0.5247</available>
+          <reserved>0.1253</reserved>
+          <total>0.6500</total>
+          <zar_value>641250.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ETH</currency>
+          <available>3.8750</available>
+          <reserved>1.1250</reserved>
+          <total>5.0000</total>
+          <zar_value>250000.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ZAR</currency>
+          <available>87500.50</available>
+          <reserved>12500.75</reserved>
+          <total>100001.25</total>
+        </balance>
+        <balance>
+          <currency>USDC</currency>
+          <available>25000.00</available>
+          <reserved>5000.00</reserved>
+          <total>30000.00</total>
+          <zar_value>555000.00</zar_value>
+        </balance>
+      </balances>
+      <last_sync>2025-03-15T09:15:00Z</last_sync>
+    </exchange_account>
+    
+    <!-- Naledi Petersen - VALR Exchange Account -->
+    <exchange_account>
+      <customer_id>FNB_CUST_ZA_2023089123</customer_id>
+      <exchange_name>VALR</exchange_name>
+      <exchange_user_id>VALR_USER_9507185284087</exchange_user_id>
+      <account_created>2023-01-20T00:00:00Z</account_created>
+      <kyc_status>VERIFIED</kyc_status>
+      <trading_tier>STANDARD</trading_tier>
+      <balances>
+        <balance>
+          <currency>BTC</currency>
+          <available>0.1250</available>
+          <reserved>0.0250</reserved>
+          <total>0.1500</total>
+          <zar_value>147750.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ETH</currency>
+          <available>1.2500</available>
+          <reserved>0.2500</reserved>
+          <total>1.5000</total>
+          <zar_value>75000.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ZAR</currency>
+          <available>25000.00</available>
+          <reserved>5000.00</reserved>
+          <total>30000.00</total>
+        </balance>
+      </balances>
+      <last_sync>2025-03-15T09:20:00Z</last_sync>
+    </exchange_account>
+    
+    <!-- Mandla Zulu - VALR Exchange Account (PEP) -->
+    <exchange_account>
+      <customer_id>FNB_CUST_ZA_2024067890</customer_id>
+      <exchange_name>VALR</exchange_name>
+      <exchange_user_id>VALR_USER_7006155287081</exchange_user_id>
+      <account_created>2024-02-10T00:00:00Z</account_created>
+      <kyc_status>ENHANCED_DUE_DILIGENCE</kyc_status>
+      <trading_tier>VIP_1</trading_tier>
+      <pep_flag>true</pep_flag>
+      <balances>
+        <balance>
+          <currency>BTC</currency>
+          <available>1.2500</available>
+          <reserved>0.2500</reserved>
+          <total>1.5000</total>
+          <zar_value>1477500.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ETH</currency>
+          <available>5.0000</available>
+          <reserved>1.0000</reserved>
+          <total>6.0000</total>
+          <zar_value>300000.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ZAR</currency>
+          <available>150000.00</available>
+          <reserved>50000.00</reserved>
+          <total>200000.00</total>
+        </balance>
+      </balances>
+      <last_sync>2025-03-15T09:10:00Z</last_sync>
+    </exchange_account>
+    
+    <!-- Bongani Khumalo - VALR Exchange Account (High Volume) -->
+    <exchange_account>
+      <customer_id>FNB_CUST_ZA_2022098765</customer_id>
+      <exchange_name>VALR</exchange_name>
+      <exchange_user_id>VALR_USER_7703125197082</exchange_user_id>
+      <account_created>2022-03-05T00:00:00Z</account_created>
+      <kyc_status>VERIFIED</kyc_status>
+      <trading_tier>VIP_5</trading_tier>
+      <balances>
+        <balance>
+          <currency>BTC</currency>
+          <available>3.7500</available>
+          <reserved>1.2500</reserved>
+          <total>5.0000</total>
+          <zar_value>4925000.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ETH</currency>
+          <available>12.5000</available>
+          <reserved>2.5000</reserved>
+          <total>15.0000</total>
+          <zar_value>750000.00</zar_value>
+        </balance>
+        <balance>
+          <currency>ZAR</currency>
+          <available>500000.00</available>
+          <reserved>250000.00</reserved>
+          <total>750000.00</total>
+        </balance>
+        <balance>
+          <currency>USDT</currency>
+          <available>100000.00</available>
+          <reserved>25000.00</reserved>
+          <total>125000.00</total>
+          <zar_value>2312500.00</zar_value>
+        </balance>
+      </balances>
+      <last_sync>2025-03-15T09:05:00Z</last_sync>
+      <monthly_trading_volume_zar>8500000.00</monthly_trading_volume_zar>
+    </exchange_account>
+  </exchange_accounts>
+  
+  <!-- TRANSACTIONS SECTION (Sample recent transactions) -->
+  <transactions>
+    <transaction>
+      <transaction_id>VALR_TX_20250314_001</transaction_id>
+      <customer_id>FNB_CUST_ZA_2023014587</customer_id>
+      <exchange>VALR</exchange>
+      <type>MARKET_BUY</type>
+      <pair>BTCZAR</pair>
+      <amount>0.1250</amount>
+      <price>985000.00</price>
+      <total_amount_zar>123125.00</total_amount_zar>
+      <fee_zar>246.25</fee_zar>
+      <timestamp>2025-03-14T14:30:15Z</timestamp>
+      <status>COMPLETED</status>
+    </transaction>
+    <transaction>
+      <transaction_id>VALR_TX_20250314_002</transaction_id>
+      <customer_id>FNB_CUST_ZA_2024067890</customer_id>
+      <exchange>VALR</exchange>
+      <type>MARKET_SELL</type>
+      <pair>ETHZAR</pair>
+      <amount>2.5000</amount>
+      <price>50000.00</price>
+      <total_amount_zar>125000.00</total_amount_zar>
+      <fee_zar>250.00</fee_zar>
+      <timestamp>2025-03-14T16:45:30Z</timestamp>
+      <status>COMPLETED</status>
+    </transaction>
+  </transactions>
 </travel_rule_data>
