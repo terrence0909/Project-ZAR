@@ -393,7 +393,7 @@ const Customers = () => {
                     return (
                       <div
                         key={customer.customer_id}
-                        onClick={() => navigate(`/Project-ZAR/customer/${customer.customer_id}`)}
+                        onClick={() => navigate(`/customer/${customer.customer_id}`)}
                         className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border hover:bg-muted/50 cursor-pointer gap-3 md:gap-4 transition-colors"
                       >
                         <div className="flex items-start md:items-center gap-3 md:gap-4 flex-1 min-w-0">
