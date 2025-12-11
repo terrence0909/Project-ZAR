@@ -95,10 +95,10 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
     const customerId = alert.id.split('-').pop();
     
     if (customerId && !customerId.startsWith('alert')) {
-      // If we have a valid customer ID, navigate to customer detail
+      // Navigate to customer detail page
       navigate(`/customer/${customerId}`);
     } else {
-      // Otherwise, navigate to customers page with search
+      // Navigate to customers page with search
       navigate(`/customers?search=${encodeURIComponent(alert.customer)}`);
     }
   };
