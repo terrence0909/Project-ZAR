@@ -14,6 +14,7 @@ interface Alert {
   wallet?: string;
   riskScore?: number;
   timestamp?: string;
+  customerId?: string; // Add this
 }
 
 interface RecentAlertsTableProps {
@@ -25,7 +26,7 @@ interface RecentAlertsTableProps {
     riskScore: number;
     timestamp: string;
     severity: 'low' | 'medium' | 'high';
-    customerId?: string;
+    customerId?: string; // This now exists
   }>;
 }
 
@@ -51,7 +52,8 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
         status: 'pending',
         wallet: alert.wallet,
         riskScore: alert.riskScore,
-        timestamp: alert.timestamp
+        timestamp: alert.timestamp,
+        customerId: alert.customerId // Pass through customerId
       };
     });
   };
@@ -60,10 +62,10 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
   const alerts: Alert[] = propAlerts && propAlerts.length > 0 
     ? formatAlerts(propAlerts)
     : [
-        { id: "1", time: "14:30", customer: "Maria Rodriguez", alertType: "High Risk Customer", severity: "high", status: "pending", wallet: "0x28c6c06298d514Db089934071355E5743bf21d60", riskScore: 72 },
-        { id: "2", time: "13:45", customer: "John Crypto", alertType: "Medium Risk Customer", severity: "medium", status: "reviewed", wallet: "0x1f9090aae28b8a3dcecc2fafcdef9f3778915e81", riskScore: 68 },
-        { id: "3", time: "11:20", customer: "Sarah Johnson", alertType: "High Risk Customer", severity: "high", status: "pending", wallet: "0xdfd5293d8e347dfe59e90efd55b2956a1343963d", riskScore: 55 },
-        { id: "4", time: "09:15", customer: "David Kim", alertType: "Undeclared Wallet", severity: "medium", status: "pending", wallet: "0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936F0bE", riskScore: 72 }
+        { id: "1", time: "14:30", customer: "Maria Rodriguez", alertType: "High Risk Customer", severity: "high", status: "pending", wallet: "0x28c6c06298d514Db089934071355E5743bf21d60", riskScore: 72, customerId: "CUST001" },
+        { id: "2", time: "13:45", customer: "John Crypto", alertType: "Medium Risk Customer", severity: "medium", status: "reviewed", wallet: "0x1f9090aae28b8a3dcecc2fafcdef9f3778915e81", riskScore: 68, customerId: "CUST002" },
+        { id: "3", time: "11:20", customer: "Sarah Johnson", alertType: "High Risk Customer", severity: "high", status: "pending", wallet: "0xdfd5293d8e347dfe59e90efd55b2956a1343963d", riskScore: 55, customerId: "CUST003" },
+        { id: "4", time: "09:15", customer: "David Kim", alertType: "Undeclared Wallet", severity: "medium", status: "pending", wallet: "0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936F0bE", riskScore: 72, customerId: "CUST004" }
       ];
 
   const getSeverityColor = (severity: string) => {
@@ -89,16 +91,13 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
     return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
   };
 
-  // Handle customer click - try to navigate to customer page
+  // Handle customer click - FIXED to use customerId
   const handleCustomerClick = (alert: Alert) => {
-    // Try to extract customer ID from alert ID
-    const customerId = alert.id.split('-').pop();
-    
-    if (customerId && !customerId.startsWith('alert')) {
-      // Navigate to customer detail page
-      navigate(`/customer/${customerId}`);
+    if (alert.customerId) {
+      // Use the actual customerId if available
+      navigate(`/customer/${alert.customerId}`);
     } else {
-      // Navigate to customers page with search
+      // Otherwise, navigate to customers page with search
       navigate(`/customers?search=${encodeURIComponent(alert.customer)}`);
     }
   };

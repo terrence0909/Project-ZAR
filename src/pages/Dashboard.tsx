@@ -72,6 +72,7 @@ interface DashboardStats {
     timestamp: string;
     severity: 'low' | 'medium' | 'high';
     description?: string;
+    customerId?: string; // Add this line
   }>;
 }
 
@@ -281,7 +282,7 @@ const Dashboard = () => {
     return Math.round(((current - previous) / previous) * 100);
   };
 
-  // Generate compliance alerts based on risk factors
+  // Generate compliance alerts based on risk factors - UPDATED WITH customerId
   const generateComplianceAlerts = (customers: any[]): Array<{
     id: string;
     type: string;
@@ -291,6 +292,7 @@ const Dashboard = () => {
     timestamp: string;
     severity: 'low' | 'medium' | 'high';
     description?: string;
+    customerId?: string;
   }> => {
     const alerts = [];
 
@@ -309,7 +311,8 @@ const Dashboard = () => {
           riskScore: Math.round(riskScore),
           timestamp: new Date(Date.now() - (index * 3600000)).toISOString(),
           severity: 'high' as const,
-          description: `Risk score of ${Math.round(riskScore)} exceeds threshold (70+)`
+          description: `Risk score of ${Math.round(riskScore)} exceeds threshold (70+)`,
+          customerId: customer.customer_id // Add customerId
         });
       }
 
@@ -324,7 +327,8 @@ const Dashboard = () => {
           riskScore: Math.round(riskScore),
           timestamp: new Date(Date.now() - ((index + 0.5) * 3600000)).toISOString(),
           severity: 'medium' as const,
-          description: `${undeclaredCount} undeclared wallet(s) found`
+          description: `${undeclaredCount} undeclared wallet(s) found`,
+          customerId: customer.customer_id // Add customerId
         });
       }
 
@@ -338,7 +342,8 @@ const Dashboard = () => {
           riskScore: Math.round(riskScore),
           timestamp: new Date(Date.now() - ((index + 1) * 3600000)).toISOString(),
           severity: 'medium' as const,
-          description: `Risk score at ${Math.round(riskScore)} - monitoring required`
+          description: `Risk score at ${Math.round(riskScore)} - monitoring required`,
+          customerId: customer.customer_id // Add customerId
         });
       }
     });
@@ -951,7 +956,7 @@ const Dashboard = () => {
                 />
               </div>
               
-              {/* Recent Alerts */}
+              {/* Recent Alerts - UPDATED TO PASS customerId */}
               <RecentAlertsTable alerts={dashboardStats?.recentAlerts} />
             </div>
           )}
