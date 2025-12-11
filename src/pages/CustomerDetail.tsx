@@ -23,7 +23,8 @@ import {
   X,
   CreditCard,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -605,102 +606,128 @@ const CustomerDetail = () => {
 
       <main className="flex-1 w-full md:ml-[280px] transition-all">
         {/* Header - Mobile Optimized */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b px-4 py-3 md:px-6 md:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => navigate(-1)}
-                className="md:hidden"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="font-bold text-primary">
-                    {customer.first_name?.[0]}{customer.last_name?.[0]}
-                  </span>
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b">
+          <div className="p-3 md:px-6 md:py-4">
+            {/* Mobile Top Bar */}
+            <div className="md:hidden mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9 -ml-2"
+                    onClick={() => navigate(-1)}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  <div>
+                    <h1 className="text-base font-bold">Customer Details</h1>
+                    <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                      {customer.customer_id}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-lg font-bold leading-tight">
-                    {customer.first_name} {customer.last_name}
-                  </h1>
-                  <p className="text-xs text-muted-foreground truncate max-w-[200px]">
-                    {customer.customer_id}
-                  </p>
-                </div>
+                <Badge className={getRiskBadge(riskScore) + " text-xs"}>
+                  {riskStatus.toUpperCase()}
+                </Badge>
               </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Badge className={getRiskBadge(riskScore) + " text-xs"}>
-                {riskStatus.toUpperCase()}
-              </Badge>
+
+            {/* Desktop Header */}
+            <div className="hidden md:flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate(-1)}
+                  className="gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="font-bold text-primary">
+                      {customer.first_name?.[0]}{customer.last_name?.[0]}
+                    </span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold">
+                      {customer.first_name} {customer.last_name}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                      {customer.customer_id}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Badge className={getRiskBadge(riskScore) + " text-sm"}>
+                  {riskStatus.toUpperCase()}
+                </Badge>
+              </div>
             </div>
-          </div>
-          
-          {/* Desktop Header Actions */}
-          <div className="hidden md:flex items-center justify-between mt-3">
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="gap-2"
-              >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                <span>Refresh</span>
-              </Button>
+
+            {/* Desktop Header Actions */}
+            <div className="hidden md:flex items-center justify-between mt-3">
+              <div className="text-sm text-muted-foreground">
+                Updated: {getTimeAgo()}
+              </div>
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportData}
-                className="gap-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleGenerateReport}
-                disabled={generatingReport}
-                className="gap-2"
-              >
-                {generatingReport ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <FileText className="w-4 h-4" />
-                )}
-                <span>Report</span>
-              </Button>
-              
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                onClick={handleFlagCustomer}
-                className="gap-2"
-              >
-                <Flag className="w-4 h-4" />
-                <span>Flag</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="gap-2"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                  <span>Refresh</span>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleExportData}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export</span>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleGenerateReport}
+                  disabled={generatingReport}
+                  className="gap-2"
+                >
+                  {generatingReport ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FileText className="w-4 h-4" />
+                  )}
+                  <span>Report</span>
+                </Button>
+                
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={handleFlagCustomer}
+                  className="gap-2"
+                >
+                  <Flag className="w-4 h-4" />
+                  <span>Flag</span>
+                </Button>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="p-3 md:p-6 max-w-7xl mx-auto">
           {/* Error Banner */}
           {error && (
             <div className="mb-4">
@@ -722,75 +749,91 @@ const CustomerDetail = () => {
             </div>
           )}
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          {/* Customer Info Bar - Mobile */}
+          <div className="md:hidden mb-4">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-card border">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                  <span className="font-bold text-primary text-lg">
+                    {customer.first_name?.[0]}{customer.last_name?.[0]}
+                  </span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{customer.first_name} {customer.last_name}</h2>
+                  <p className="text-xs text-muted-foreground">{customer.email || 'No email'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Cards - Mobile Optimized */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-6">
             <Card className="border-border/50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Risk Score</p>
-                    <p className={`text-2xl font-bold ${getRiskColor(riskScore)}`}>
+                    <p className={`text-lg md:text-2xl font-bold ${getRiskColor(riskScore)}`}>
                       {riskScore}
                     </p>
-                    <p className="text-xs text-muted-foreground">/100</p>
                   </div>
-                  <Shield className={`w-8 h-8 ${getRiskColor(riskScore)}`} />
+                  <Shield className={`w-6 h-6 md:w-8 md:h-8 ${getRiskColor(riskScore)}`} />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Exposure</p>
-                    <p className="text-xl font-bold">{formatZAR(stats.totalExposure)}</p>
+                    <p className="text-lg md:text-xl font-bold">{formatZAR(stats.totalExposure)}</p>
                   </div>
-                  <Wallet className="w-8 h-8 text-primary" />
+                  <Wallet className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Wallets</p>
-                    <p className="text-xl font-bold">{stats.walletCount}</p>
+                    <p className="text-lg md:text-xl font-bold">{stats.walletCount}</p>
                     <p className="text-xs text-muted-foreground">
-                      {stats.declaredWallets}D • {stats.undeclaredWallets}U
+                      {stats.declaredWallets}D/{stats.undeclaredWallets}U
                     </p>
                   </div>
-                  <CreditCard className="w-8 h-8 text-muted-foreground" />
+                  <CreditCard className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground" />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Risk Flags</p>
-                    <p className={`text-xl font-bold ${activeRiskFlags.length > 0 ? 'text-destructive' : 'text-success'}`}>
+                    <p className={`text-lg md:text-xl font-bold ${activeRiskFlags.length > 0 ? 'text-destructive' : 'text-success'}`}>
                       {activeRiskFlags.length}
                     </p>
                   </div>
-                  <AlertCircle className={`w-8 h-8 ${activeRiskFlags.length > 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
+                  <AlertCircle className={`w-6 h-6 md:w-8 md:h-8 ${activeRiskFlags.length > 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Mobile Action Buttons */}
-          <div className="flex gap-2 mb-6 md:hidden overflow-x-auto pb-2">
+          <div className="flex gap-2 mb-4 md:hidden overflow-x-auto pb-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex-shrink-0"
+              className="flex-shrink-0 px-3"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
             
@@ -798,9 +841,9 @@ const CustomerDetail = () => {
               variant="outline" 
               size="sm" 
               onClick={handleExportData}
-              className="flex-shrink-0"
+              className="flex-shrink-0 px-3"
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-3.5 h-3.5 mr-1" />
               Export
             </Button>
             
@@ -809,12 +852,12 @@ const CustomerDetail = () => {
               size="sm" 
               onClick={handleGenerateReport}
               disabled={generatingReport}
-              className="flex-shrink-0"
+              className="flex-shrink-0 px-3"
             >
               {generatingReport ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
               ) : (
-                <FileText className="w-4 h-4 mr-2" />
+                <FileText className="w-3.5 h-3.5 mr-1" />
               )}
               Report
             </Button>
@@ -823,45 +866,38 @@ const CustomerDetail = () => {
               variant="destructive" 
               size="sm" 
               onClick={handleFlagCustomer}
-              className="flex-shrink-0"
+              className="flex-shrink-0 px-3"
             >
-              <Flag className="w-4 h-4 mr-2" />
+              <Flag className="w-3.5 h-3.5 mr-1" />
               Flag
             </Button>
           </div>
 
-          {/* Customer Info & Wallets */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          {/* Customer Info & Wallets - Mobile Stacked */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
             <Card className="border-border/50">
-              <CardHeader className="p-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Customer Information
+              <CardHeader className="p-3 md:p-4">
+                <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Customer Info
                 </CardTitle>
-                <CardDescription>Identity and contact details</CardDescription>
               </CardHeader>
-              <CardContent className="p-4 pt-0 space-y-4">
-                <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs text-muted-foreground">SA ID Number</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <p className="font-medium text-sm truncate">{customer.sa_id || 'N/A'}</p>
-                        {customer.sa_id && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => copyToClipboard(customer.sa_id!, "SA ID copied")}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">VASP</p>
-                      <p className="font-medium text-sm mt-1">{customer.vasp_id || 'Unknown'}</p>
+              <CardContent className="p-3 md:p-4 pt-0 space-y-3">
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">SA ID Number</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <p className="font-medium text-sm truncate">{customer.sa_id || 'N/A'}</p>
+                      {customer.sa_id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => copyToClipboard(customer.sa_id!, "SA ID copied")}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                   
@@ -873,7 +909,7 @@ const CustomerDetail = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6"
+                          className="h-5 w-5"
                           onClick={() => copyToClipboard(customer.email!, "Email copied")}
                         >
                           <Copy className="h-3 w-3" />
@@ -882,13 +918,7 @@ const CustomerDetail = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Customer Since</p>
-                      <p className="font-medium text-sm mt-1">
-                        {new Date(customer.created_at).toLocaleDateString('en-ZA')}
-                      </p>
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <p className="text-xs text-muted-foreground">KYC Status</p>
                       <div className="mt-1">
@@ -903,33 +933,38 @@ const CustomerDetail = () => {
                         </Badge>
                       </div>
                     </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Customer Since</p>
+                      <p className="font-medium text-xs mt-1">
+                        {new Date(customer.created_at).toLocaleDateString('en-ZA')}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
-              <CardHeader className="p-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Wallet className="w-5 h-5" />
+              <CardHeader className="p-3 md:p-4">
+                <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                  <Wallet className="w-4 h-4" />
                   Wallet Summary
                 </CardTitle>
-                <CardDescription>Declared and undeclared wallets</CardDescription>
               </CardHeader>
-              <CardContent className="p-4 pt-0 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col p-3 rounded-lg bg-success/10 border border-success/20">
+              <CardContent className="p-3 md:p-4 pt-0 space-y-3">
+                <div className="grid grid-cols-2 gap-2 md:gap-3">
+                  <div className="flex flex-col p-2 md:p-3 rounded-lg bg-success/10 border border-success/20">
                     <p className="text-xs text-muted-foreground">Declared</p>
-                    <p className="text-xl font-bold text-success mt-1">{stats.declaredWallets}</p>
+                    <p className="text-lg md:text-xl font-bold text-success mt-1">{stats.declaredWallets}</p>
                   </div>
-                  <div className="flex flex-col p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                  <div className="flex flex-col p-2 md:p-3 rounded-lg bg-destructive/10 border border-destructive/20">
                     <p className="text-xs text-muted-foreground">Undeclared</p>
-                    <p className="text-xl font-bold text-destructive mt-1">{stats.undeclaredWallets}</p>
+                    <p className="text-lg md:text-xl font-bold text-destructive mt-1">{stats.undeclaredWallets}</p>
                   </div>
                 </div>
                 
                 {customer.primary_wallet && (
-                  <div className="p-3 rounded-lg bg-muted/10 border border-muted/20">
+                  <div className="p-2 md:p-3 rounded-lg bg-muted/10 border border-muted/20">
                     <p className="text-xs text-muted-foreground mb-1">Primary Wallet</p>
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-mono text-xs truncate flex-1">{formatWalletAddress(customer.primary_wallet)}</p>
@@ -937,7 +972,7 @@ const CustomerDetail = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6"
+                          className="h-5 w-5"
                           onClick={() => copyToClipboard(customer.primary_wallet!, "Wallet copied")}
                         >
                           <Copy className="h-3 w-3" />
@@ -945,7 +980,7 @@ const CustomerDetail = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6"
+                          className="h-5 w-5"
                           onClick={() => window.open(`https://etherscan.io/address/${customer.primary_wallet}`, '_blank')}
                         >
                           <ExternalLink className="h-3 w-3" />
@@ -962,42 +997,35 @@ const CustomerDetail = () => {
           </div>
 
           {/* Tabs Section - Mobile Optimized */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Customer Details</h2>
-              <div className="text-xs text-muted-foreground hidden md:block">
-                Select a tab below
-              </div>
-            </div>
-            
+          <div className="mb-4 md:mb-6">
             {/* Mobile Tab Navigation - Scrollable */}
-            <div className="md:hidden mb-4">
-              <div className="flex overflow-x-auto pb-2 space-x-2 -mx-4 px-4">
+            <div className="md:hidden mb-3">
+              <div className="flex overflow-x-auto pb-1 space-x-1">
                 <Button
                   variant={activeTab === "wallets" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setActiveTab("wallets")}
-                  className="flex-shrink-0 gap-2"
+                  className="flex-shrink-0 px-3 gap-1"
                 >
-                  <CreditCard className="w-4 h-4" />
+                  <CreditCard className="w-3.5 h-3.5" />
                   Wallets
                 </Button>
                 <Button
                   variant={activeTab === "transactions" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setActiveTab("transactions")}
-                  className="flex-shrink-0 gap-2"
+                  className="flex-shrink-0 px-3 gap-1"
                 >
-                  <TrendingUp className="w-4 h-4" />
+                  <TrendingUp className="w-3.5 h-3.5" />
                   Transactions
                 </Button>
                 <Button
                   variant={activeTab === "riskflags" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setActiveTab("riskflags")}
-                  className="flex-shrink-0 gap-2 relative"
+                  className="flex-shrink-0 px-3 gap-1 relative"
                 >
-                  <AlertCircle className="w-4 h-4" />
+                  <AlertCircle className="w-3.5 h-3.5" />
                   Risk Flags
                   {activeRiskFlags.length > 0 && (
                     <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] flex items-center justify-center text-white">
@@ -1035,18 +1063,18 @@ const CustomerDetail = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {/* Wallets Tab */}
             {activeTab === "wallets" && (
               <Card className="border-border/50">
-                <CardHeader className="p-4">
+                <CardHeader className="p-3 md:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <CreditCard className="w-5 h-5" />
+                      <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                        <CreditCard className="w-4 h-4" />
                         Customer Wallets
                       </CardTitle>
-                      <CardDescription>All detected wallet addresses</CardDescription>
+                      <CardDescription className="hidden md:block">All detected wallet addresses</CardDescription>
                     </div>
                     <Badge variant="outline" className="text-xs">
                       {customer.wallets?.length || 0} wallets
@@ -1125,13 +1153,13 @@ const CustomerDetail = () => {
                       
                       {/* Mobile Cards */}
                       <div className="md:hidden">
-                        <div className="space-y-2 p-4">
+                        <div className="space-y-2 p-3">
                           {customer.wallets.map((wallet, index) => (
                             <div key={wallet.address || index} className="p-3 rounded-lg border border-border/50 bg-card">
-                              <div className="flex justify-between items-start mb-3">
+                              <div className="flex justify-between items-start mb-2">
                                 <div>
                                   <p className="font-mono text-xs mb-1">{formatWalletAddress(wallet.address)}</p>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1 flex-wrap">
                                     <Badge 
                                       className={wallet.declared ? 'bg-success/20 text-success text-xs' : 'bg-destructive/20 text-destructive text-xs'}
                                     >
@@ -1161,16 +1189,16 @@ const CustomerDetail = () => {
                                   </Button>
                                 </div>
                               </div>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Risk Score</p>
-                                  <p className={getRiskColor(wallet.risk_score) + " font-medium"}>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Risk Score</p>
+                                  <p className={getRiskColor(wallet.risk_score) + " text-sm font-medium"}>
                                     {wallet.risk_score || 'N/A'}
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Balance</p>
-                                  <p className="font-medium">{wallet.balance !== undefined ? `${wallet.balance} ETH` : 'N/A'}</p>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Balance</p>
+                                  <p className="text-sm font-medium">{wallet.balance !== undefined ? `${wallet.balance} ETH` : 'N/A'}</p>
                                 </div>
                               </div>
                             </div>
@@ -1179,9 +1207,9 @@ const CustomerDetail = () => {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No wallet data available</p>
+                    <div className="text-center py-6 text-muted-foreground">
+                      <CreditCard className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No wallet data available</p>
                     </div>
                   )}
                 </CardContent>
@@ -1191,14 +1219,14 @@ const CustomerDetail = () => {
             {/* Transactions Tab */}
             {activeTab === "transactions" && (
               <Card className="border-border/50">
-                <CardHeader className="p-4">
+                <CardHeader className="p-3 md:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5" />
+                      <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
                         Recent Transactions
                       </CardTitle>
-                      <CardDescription>Latest transaction activity</CardDescription>
+                      <CardDescription className="hidden md:block">Latest transaction activity</CardDescription>
                     </div>
                     <Badge variant="outline" className="text-xs">
                       {transactions.length} total
@@ -1207,9 +1235,9 @@ const CustomerDetail = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                   {transactions.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No transaction data available</p>
+                    <div className="text-center py-6 text-muted-foreground">
+                      <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No transaction data available</p>
                     </div>
                   ) : (
                     <>
@@ -1289,10 +1317,10 @@ const CustomerDetail = () => {
                       
                       {/* Mobile Cards */}
                       <div className="md:hidden">
-                        <div className="space-y-2 p-4">
+                        <div className="space-y-2 p-3">
                           {transactions.slice(0, 5).map((tx) => (
                             <div key={tx.id} className="p-3 rounded-lg border border-border/50 bg-card">
-                              <div className="flex justify-between items-start mb-3">
+                              <div className="flex justify-between items-start mb-2">
                                 <div>
                                   <p className="font-mono text-xs mb-1">{tx.id.slice(0, 12)}...</p>
                                   <Badge 
@@ -1312,25 +1340,25 @@ const CustomerDetail = () => {
                                   })}
                                 </span>
                               </div>
-                              <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div className="grid grid-cols-2 gap-2 mb-2">
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Type</p>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Type</p>
                                   <Badge variant="outline" className="text-xs capitalize">
                                     {tx.type}
                                   </Badge>
                                 </div>
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Amount</p>
-                                  <p className="font-medium text-sm">{formatCurrency(tx.amount, tx.currency)}</p>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Amount</p>
+                                  <p className="text-sm font-medium">{formatCurrency(tx.amount, tx.currency)}</p>
                                 </div>
                               </div>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Value (ZAR)</p>
-                                  <p className="font-medium text-sm">{formatZAR(tx.value_zar)}</p>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Value (ZAR)</p>
+                                  <p className="text-sm font-medium">{formatZAR(tx.value_zar)}</p>
                                 </div>
                                 <div>
-                                  <p className="text-xs text-muted-foreground mb-1">Risk Score</p>
+                                  <p className="text-xs text-muted-foreground mb-0.5">Risk Score</p>
                                   {tx.risk_score ? (
                                     <Badge 
                                       variant="outline" 
@@ -1353,7 +1381,7 @@ const CustomerDetail = () => {
                       </div>
                       
                       {transactions.length > 5 && (
-                        <div className="text-center py-3 border-t text-xs text-muted-foreground">
+                        <div className="text-center py-2 border-t text-xs text-muted-foreground">
                           Showing 5 of {transactions.length} transactions
                         </div>
                       )}
@@ -1366,32 +1394,32 @@ const CustomerDetail = () => {
             {/* Risk Flags Tab */}
             {activeTab === "riskflags" && (
               <Card className="border-border/50">
-                <CardHeader className="p-4">
+                <CardHeader className="p-3 md:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" />
+                      <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
                         Risk Flags
                       </CardTitle>
-                      <CardDescription>Compliance alerts requiring attention</CardDescription>
+                      <CardDescription className="hidden md:block">Compliance alerts requiring attention</CardDescription>
                     </div>
                     <Badge variant={activeRiskFlags.length === 0 ? "default" : "destructive"} className="text-xs">
                       {activeRiskFlags.length} Active
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4">
+                <CardContent className="p-3 md:p-4">
                   {riskFlags.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No risk flags detected for this customer</p>
+                    <div className="text-center py-6 text-muted-foreground">
+                      <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No risk flags detected for this customer</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {riskFlags.map((flag) => (
                         <div
                           key={flag.id}
-                          className={`p-4 rounded-lg border ${
+                          className={`p-3 rounded-lg border ${
                             flag.resolved 
                               ? 'bg-muted/10 border-muted/30'
                               : flag.severity === "high"
@@ -1399,11 +1427,11 @@ const CustomerDetail = () => {
                                 : "bg-warning/10 border-warning/30"
                           }`}
                         >
-                          <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-2 mb-1">
                                 <AlertTriangle
-                                  className={`w-5 h-5 flex-shrink-0 ${
+                                  className={`w-4 h-4 flex-shrink-0 ${
                                     flag.resolved 
                                       ? 'text-muted-foreground'
                                       : flag.severity === "high" 
@@ -1413,7 +1441,7 @@ const CustomerDetail = () => {
                                 />
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-semibold text-sm truncate">{flag.type}</h4>
-                                  <div className="flex items-center gap-2 mt-1">
+                                  <div className="flex items-center gap-1 mt-0.5">
                                     <Badge
                                       className={
                                         flag.resolved 
@@ -1433,7 +1461,7 @@ const CustomerDetail = () => {
                                   </div>
                                 </div>
                               </div>
-                              <p className="text-sm text-muted-foreground mb-3">{flag.description}</p>
+                              <p className="text-xs text-muted-foreground mb-1">{flag.description}</p>
                               <p className="text-xs text-muted-foreground">
                                 {new Date(flag.timestamp).toLocaleDateString('en-ZA', { 
                                   month: 'short',
@@ -1448,9 +1476,9 @@ const CustomerDetail = () => {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleResolveFlag(flag.id)}
-                                className="h-8 text-xs flex-shrink-0"
+                                className="h-7 text-xs flex-shrink-0 px-2"
                               >
-                                <CheckCircle className="w-3 h-3 mr-1" />
+                                <CheckCircle className="w-3 h-3 mr-0.5" />
                                 Resolve
                               </Button>
                             )}
