@@ -586,24 +586,6 @@ const CustomerDetail = () => {
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar lastUpdated={getTimeAgo()} />
       
-      {/* Mobile Sidebar Toggle */}
-      <Button
-        variant="outline"
-        size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden bg-background/80 backdrop-blur-sm"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
-
-      {/* Overlay for mobile sidebar */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <main className="flex-1 w-full md:ml-[280px] transition-all">
         {/* Header - Mobile Optimized */}
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b">
@@ -613,21 +595,21 @@ const CustomerDetail = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     size="icon"
-                    className="h-9 w-9 -ml-2"
+                    className="h-10 w-10 border-2"
                     onClick={() => navigate(-1)}
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-6 w-6" />
                   </Button>
                   <div>
-                    <h1 className="text-base font-bold">Customer Details</h1>
-                    <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                    <h1 className="text-lg font-bold">Customer Details</h1>
+                    <p className="text-xs text-muted-foreground truncate max-w-[180px]">
                       {customer.customer_id}
                     </p>
                   </div>
                 </div>
-                <Badge className={getRiskBadge(riskScore) + " text-xs"}>
+                <Badge className={getRiskBadge(riskScore) + " text-xs px-3 py-1"}>
                   {riskStatus.toUpperCase()}
                 </Badge>
               </div>
