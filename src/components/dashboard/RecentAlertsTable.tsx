@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Alert {
   id: string;
@@ -25,10 +25,12 @@ interface RecentAlertsTableProps {
     riskScore: number;
     timestamp: string;
     severity: 'low' | 'medium' | 'high';
+    customerId?: string;
   }>;
 }
 
 export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps) {
+  const navigate = useNavigate();
   
   // Convert prop alerts to the format expected by the component
   const formatAlerts = (alerts: any[]): Alert[] => {
@@ -46,7 +48,7 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
         customer: alert.customer,
         alertType: alert.type || 'Risk Alert',
         severity: alert.severity || 'high',
-        status: 'pending', // Default status
+        status: 'pending',
         wallet: alert.wallet,
         riskScore: alert.riskScore,
         timestamp: alert.timestamp
@@ -87,6 +89,20 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
     return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
   };
 
+  // Handle customer click - try to navigate to customer page
+  const handleCustomerClick = (alert: Alert) => {
+    // Try to extract customer ID from alert ID
+    const customerId = alert.id.split('-').pop();
+    
+    if (customerId && !customerId.startsWith('alert')) {
+      // If we have a valid customer ID, navigate to customer detail
+      navigate(`/customer/${customerId}`);
+    } else {
+      // Otherwise, navigate to customers page with search
+      navigate(`/customers?search=${encodeURIComponent(alert.customer)}`);
+    }
+  };
+
   return (
     <Card className="glass-card border-border/50">
       <CardHeader className="pb-4">
@@ -120,13 +136,12 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
                   key={alert.id || idx}
                   className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer animate-fade-in"
                   style={{ animationDelay: `${idx * 0.05}s` }}
-                  onClick={() => {
-                    // Navigate to customer search with wallet
-                    window.location.href = `/?search=${alert.wallet || alert.customer}`;
-                  }}
+                  onClick={() => handleCustomerClick(alert)}
                 >
                   <td className="py-4 px-4 text-sm">{alert.time}</td>
-                  <td className="py-4 px-4 font-medium">{alert.customer}</td>
+                  <td className="py-4 px-4 font-medium hover:text-primary transition-colors">
+                    {alert.customer}
+                  </td>
                   <td className="py-4 px-4 text-sm font-mono text-muted-foreground">
                     {truncateWallet(alert.wallet)}
                   </td>
@@ -168,11 +183,9 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
           {alerts.map((alert, idx) => (
             <div
               key={alert.id || idx}
-              className="glass-card p-4 rounded-lg space-y-2 animate-fade-in cursor-pointer"
+              className="glass-card p-4 rounded-lg space-y-2 animate-fade-in cursor-pointer hover:bg-muted/10 transition-colors"
               style={{ animationDelay: `${idx * 0.05}s` }}
-              onClick={() => {
-                window.location.href = `/?search=${alert.wallet || alert.customer}`;
-              }}
+              onClick={() => handleCustomerClick(alert)}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{alert.time}</span>
@@ -181,7 +194,9 @@ export function RecentAlertsTable({ alerts: propAlerts }: RecentAlertsTableProps
                   {alert.severity}
                 </Badge>
               </div>
-              <div className="font-medium">{alert.customer}</div>
+              <div className="font-medium hover:text-primary transition-colors">
+                {alert.customer}
+              </div>
               <div className="text-sm text-muted-foreground font-mono">
                 {truncateWallet(alert.wallet)}
               </div>
